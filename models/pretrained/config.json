@@ -1,0 +1,6 @@
+{
+  "input_dim": 257,
+  "image_dim": 256,
+  "sensor_dim": 1,
+  "seed": 42
+}

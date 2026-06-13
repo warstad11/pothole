@@ -1,0 +1,209 @@
+{
+ "primary_reviewer": "TS",
+ "reviewers": {
+  "TS": 264
+ },
+ "labeled": 264,
+ "total_items": 837,
+ "per_platform": {
+  "iphone": {
+   "pipelines": {
+    "image": {
+     "events": 15,
+     "labeled": 1,
+     "tp": 0,
+     "fp": 1,
+     "unsure": 0,
+     "precision": 0.0,
+     "precision_ci95": [
+      0.0,
+      0.7934567085261071
+     ],
+     "events_per_min": 0.27,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": null
+    },
+    "sensor": {
+     "events": 455,
+     "labeled": 143,
+     "tp": 9,
+     "fp": 76,
+     "unsure": 58,
+     "precision": 0.10588235294117647,
+     "precision_ci95": [
+      0.056711765159551245,
+      0.18913702639755714
+     ],
+     "events_per_min": 8.08,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": 1.0
+    },
+    "hybrid": {
+     "events": 383,
+     "labeled": 119,
+     "tp": 6,
+     "fp": 68,
+     "unsure": 45,
+     "precision": 0.08108108108108109,
+     "precision_ci95": [
+      0.03768933680933338,
+      0.16582138239479394
+     ],
+     "events_per_min": 6.8,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": 1.0
+    }
+   },
+   "probes": {
+    "labeled": 46,
+    "pothole": 0,
+    "background_rate": 0.0,
+    "rate_ci95": [
+     0.0,
+     0.07707617732978073
+    ],
+    "unsure": 9
+   }
+  },
+  "nuscenes": {
+   "pipelines": {
+    "image": {
+     "events": 4,
+     "labeled": 2,
+     "tp": 0,
+     "fp": 1,
+     "unsure": 1,
+     "precision": 0.0,
+     "precision_ci95": [
+      0.0,
+      0.7934567085261071
+     ],
+     "events_per_min": 2.07,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": null
+    },
+    "sensor": {
+     "events": 0,
+     "labeled": 0,
+     "tp": 0,
+     "fp": 0,
+     "unsure": 0,
+     "precision": null,
+     "precision_ci95": [
+      null,
+      null
+     ],
+     "events_per_min": 0.0,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": null
+    },
+    "hybrid": {
+     "events": 2,
+     "labeled": 1,
+     "tp": 0,
+     "fp": 1,
+     "unsure": 0,
+     "precision": 0.0,
+     "precision_ci95": [
+      0.0,
+      0.7934567085261071
+     ],
+     "events_per_min": 1.04,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": null
+    }
+   },
+   "probes": {
+    "labeled": 6,
+    "pothole": 0,
+    "background_rate": 0.0,
+    "rate_ci95": [
+     0.0,
+     0.3903430336530645
+    ],
+    "unsure": 4
+   }
+  },
+  "all": {
+   "pipelines": {
+    "image": {
+     "events": 19,
+     "labeled": 3,
+     "tp": 0,
+     "fp": 2,
+     "unsure": 1,
+     "precision": 0.0,
+     "precision_ci95": [
+      0.0,
+      0.6576280471103807
+     ],
+     "events_per_min": 0.33,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": null
+    },
+    "sensor": {
+     "events": 455,
+     "labeled": 143,
+     "tp": 9,
+     "fp": 76,
+     "unsure": 58,
+     "precision": 0.10588235294117647,
+     "precision_ci95": [
+      0.056711765159551245,
+      0.18913702639755714
+     ],
+     "events_per_min": 7.82,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": 1.0
+    },
+    "hybrid": {
+     "events": 385,
+     "labeled": 120,
+     "tp": 6,
+     "fp": 69,
+     "unsure": 45,
+     "precision": 0.08,
+     "precision_ci95": [
+      0.03717961789436808,
+      0.16374984066557996
+     ],
+     "events_per_min": 6.61,
+     "est_missed_potholes": 0.0,
+     "est_recall_proxy": 1.0
+    }
+   },
+   "probes": {
+    "labeled": 52,
+    "pothole": 0,
+    "background_rate": 0.0,
+    "rate_ci95": [
+     0.0,
+     0.06879459041288215
+    ],
+    "unsure": 13
+   }
+  }
+ },
+ "paired_tests": {
+  "hybrid_vs_image": {
+   "only_hybrid": 6,
+   "only_image": 0,
+   "p_value_exact_mcnemar": 0.03125
+  },
+  "hybrid_vs_sensor": {
+   "only_hybrid": 3,
+   "only_sensor": 6,
+   "p_value_exact_mcnemar": 0.5078125
+  },
+  "sensor_vs_image": {
+   "only_sensor": 9,
+   "only_image": 0,
+   "p_value_exact_mcnemar": 0.00390625
+  }
+ },
+ "agreement": {
+  "overlap_n": 0,
+  "cohen_kappa": null
+ },
+ "caveat": "recall figures are ESTIMATES from probe sampling, not exhaustive ground truth"
+}

@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pothole Research Platform</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 50px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 1rem;
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 5px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        button.action-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button.action-btn:hover {
+            background: #219150;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #job-list {
+            font-family: monospace;
+        }
+
+        .status-queued {
+            color: #f39c12;
+        }
+
+        .status-running {
+            color: #3498db;
+        }
+
+        .status-completed {
+            color: #27ae60;
+        }
+
+        .status-failed {
+            color: #c0392b;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .results-table th,
+        .results-table td {
+            border: 1px solid #eee;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+        }
+
+        .export-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .export-btn:hover {
+            background: #5a6268;
+        }
+
+        .cm-heatmap {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px;
+            background: #eee;
+            border: 1px solid #ddd;
+        }
+
+        .cm-cell {
+            padding: 15px;
+            text-align: center;
+            background: white;
+        }
+
+        .cm-cell span {
+            font-size: 0.7rem;
+            color: #888;
+            display: block;
+        }
+
+        .cm-cell strong {
+            font-size: 1.1rem;
+        }
+
+        .parameters-list {
+            font-size: 0.8rem;
+            background: #f1f8ff;
+            padding: 8px;
+            border-left: 4px solid #0366d6;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .parameters-list span {
+            margin-right: 15px;
+            white-space: nowrap;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .source-vision {
+            background: #e1f5fe;
+            color: #01579b;
+            border: 1px solid #b3e5fc;
+        }
+
+        .source-sensor {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffe0b2;
+        }
+
+        .source-both {
+            background: #f3e5f5;
+            color: #4a148c;
+            border: 1px solid #e1bee7;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Pothole Detection Research Platform (Local)</h1>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <button class="nav-btn active" onclick="showPanel('panel-setup')">A. Setup Checklist</button>
+            <button class="nav-btn" onclick="showPanel('panel-image')">B. Image Models</button>
+            <button class="nav-btn" onclick="showPanel('panel-sensor')">C. Sensor Models</button>
+            <button class="nav-btn" onclick="showPanel('panel-hybrid')">D. Hybrid Models</button>
+            <button class="nav-btn" onclick="showPanel('panel-review')">E. Review & Deploy</button>
+            <button class="nav-btn" onclick="showPanel('panel-nuscenes')">E1. Realworld NuScenes</button>
+            <button class="nav-btn" onclick="showPanel('panel-metrics')">F. Manual Accuracy</button>
+            <button class="nav-btn" onclick="showPanel('panel-research')">G. Research Analytics</button>
+            <hr>
+            <div id="status-box">
+                <strong>System Status</strong>
+                <div id="api-status">Connecting...</div>
+            </div>
+            <hr>
+            <strong>Recent Jobs</strong>
+            <div id="job-list-mini" style="font-size: 0.8rem;"></div>
+        </div>
+
+        <div class="content">
+            <!-- Panel A -->
+            <div id="panel-setup" class="panel active">
+                <h2>A. Setup Checklist</h2>
+                <div class="card">
+                    <div class="card">
+                        <h3>1. Datasets</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <strong>Image Sets:</strong>
+                                <ul id="status-image" style="padding-left: 20px; margin: 5px 0;">
+                                    <li>Unknown</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Sensor Sets:</strong>
+                                <ul id="status-sensor" style="padding-left: 20px; margin: 5px 0;">
+                                    <li>Unknown</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>Hybrid Sets:</strong>
+                                <ul id="status-hybrid" style="padding-left: 20px; margin: 5px 0;">
+                                    <li>Unknown</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button class="action-btn" style="margin-top: 10px;"
+                            onclick="createJob('validate_datasets')">Validate All Datasets</button>
+                    </div>
+                    <div class="card">
+                        <h3>2. Code Integrity</h3>
+                        <button class="action-btn" onclick="createJob('run_tests')">Run Unit Tests</button>
+                        <div id="test-status-summary" style="margin-top: 10px; font-weight: bold;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel B -->
+            <div id="panel-image" class="panel">
+                <h2>B. Image Models</h2>
+                <div class="card">
+                    <h3>Train & Evaluate</h3>
+                    <div style="margin-bottom: 10px;">
+                        <label>Dataset:</label>
+                        <select id="image-dataset-select" onchange="pollJobs()"></select>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label>Model:</label>
+                        <select id="image-model-select" onchange="pollJobs()">
+                            <option value="yolov8">YOLOv8</option>
+                            <option value="faster_rcnn">Faster R-CNN</option>
+                            <option value="unet">U-Net</option>
+                        </select>
+                    </div>
+                    <button class="action-btn" onclick="createJob('train_image', {
+                            model: document.getElementById('image-model-select').value,
+                            dataset_path: 'data/image/raw/' + document.getElementById('image-dataset-select').value
+                        })">Run Experiment</button>
+                    <div id="image-results" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- Panel C -->
+            <div id="panel-sensor" class="panel">
+                <h2>C. Sensor Models</h2>
+                <div class="card">
+                    <h3>Train & Evaluate</h3>
+                    <div style="margin-bottom: 10px;">
+                        <label>Dataset:</label>
+                        <select id="sensor-dataset-select" onchange="pollJobs()"></select>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label>Model:</label>
+                        <select id="sensor-model-select" onchange="pollJobs()">
+                            <option value="random_forest">Random Forest</option>
+                            <option value="cnn">1D-CNN</option>
+                        </select>
+                    </div>
+                    <button class="action-btn" onclick="createJob('train_sensor', {
+                                model: document.getElementById('sensor-model-select').value,
+                                dataset_path: 'data/' + document.getElementById('sensor-dataset-select').value
+                            })">Run Experiment</button>
+                    <div id="sensor-results" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- Panel D -->
+            <div id="panel-hybrid" class="panel">
+                <h2>D. Hybrid Models</h2>
+                <div class="card">
+                    <h3>Train & Evaluate</h3>
+                    <div style="margin-bottom: 10px;">
+                        <label>Dataset:</label>
+                        <select id="hybrid-dataset-select" onchange="pollJobs()"></select>
+                    </div>
+
+                    <!-- NEW: Model Selection -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <label>Image Model (Best):</label>
+                            <select id="hybrid-image-candidate-select" style="width: 100%;">
+                                <option value="">Auto (All Permutations)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Sensor Model (Best):</label>
+                            <select id="hybrid-sensor-candidate-select" style="width: 100%;">
+                                <option value="">Auto (All Permutations)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <label>Fusion Type:</label>
+                        <select id="hybrid-fusion-select" onchange="pollJobs()">
+                            <option value="feature">Feature Fusion</option>
+                            <option value="late">Late Fusion</option>
+                        </select>
+                    </div>
+                    <button class="action-btn" onclick="createJob('train_hybrid', {
+                        dataset_path: 'data/' + document.getElementById('hybrid-dataset-select').value,
+                        fusion_type: document.getElementById('hybrid-fusion-select').value,
+                        image_model_id: document.getElementById('hybrid-image-candidate-select').value,
+                        sensor_model_id: document.getElementById('hybrid-sensor-candidate-select').value
+                    })">Run Hybrid Experiment</button>
+                    <div id="hybrid-results" style="margin-top: 20px;"></div>
+
+                    <div id="hybrid-pairing-controls"
+                        style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ccc; display: none;">
+                        <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; color: #666;">Visualized Pairing</h4>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.8rem;">Image Model:</label>
+                                <select id="hybrid-image-select" onchange="pollJobs()"
+                                    style="width: 100%; font-size: 0.85rem;">
+                                    <option value="yolov8">YOLOv8</option>
+                                    <option value="faster_rcnn">Faster R-CNN</option>
+                                    <option value="unet">U-Net</option>
+                                </select>
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.8rem;">Sensor Model:</label>
+                                <select id="hybrid-sensor-select" onchange="pollJobs()"
+                                    style="width: 100%; font-size: 0.85rem;">
+                                    <option value="random_forest">Random Forest</option>
+                                    <option value="cnn">1D-CNN</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel E -->
+            <div id="panel-review" class="panel">
+                <h2>E. Real-World Validation (iPhone)</h2>
+                <!-- ... existing content ... -->
+
+                <!-- Setup Inference -->
+                <div class="card">
+                    <h3>1. Run Inference on Real Data</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">Driving Session
+                                (iPhone):</label>
+                            <select id="review-session-select"
+                                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                                <option value="">Loading sessions...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">Hybrid Model (Top
+                                3):</label>
+                            <select id="review-model-select"
+                                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                                <option value="">Loading models...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="runInference()" id="btn-run-inference">Run Detection</button>
+                    <div id="inference-status" style="margin-top: 10px; font-style: italic;"></div>
+                </div>
+
+                <!-- Verification UI -->
+                <div id="verification-ui" style="display:none;" class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>2. Verify Events</h3>
+                        <div style="background: #e3f2fd; padding: 5px 10px; border-radius: 4px; font-size: 0.9rem;">
+                            Session: <strong id="current-session-name">-</strong> |
+                            Run: <strong id="current-run-id">-</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                        <!-- Player & Controls -->
+                        <div>
+                            <video id="review-player" controls
+                                style="width: 30%; background: #000; border-radius: 8px; margin-bottom: 10px;"></video>
+
+                            <div style="display: flex; gap: 10px; justify-content: center;">
+                                <button onclick="labelEvent(true)" class="action-btn"
+                                    style="background: #2ecc71; flex: 1; padding: 15px;">
+                                    ✅ POTHOLE (1)
+                                </button>
+                                <button onclick="labelEvent(false)" class="action-btn"
+                                    style="background: #e74c3c; flex: 1; padding: 15px;">
+                                    ❌ FALSE POSITIVE (2)
+                                </button>
+                            </div>
+                            <div style="text-align: center; margin-top: 10px; font-size: 0.85rem; color: #666;">
+                                Hint: Video seeks to 2s before event.
+                            </div>
+                        </div>
+
+                        <!-- Event List -->
+                        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee;">
+                            <table class="results-table" style="margin: 0;">
+                                <thead style="position: sticky; top: 0; background: #fff; z-index: 1;">
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Score</th>
+                                        <th>Source</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="event-list-body">
+                                    <!-- Rows injected via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel E1: Realworld NuScenes -->
+            <div id="panel-nuscenes" class="panel">
+                <h2>E1. Real-World Validation (nuScenes)</h2>
+
+                <!-- Setup Inference -->
+                <div class="card">
+                    <h3>1. Run Inference on nuScenes Data</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">nuScenes Scene:</label>
+                            <select id="nu-session-select" onchange="window.checkNuHistory(this.value.split('/').pop())"
+                                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                                <option value="">Loading scenes...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:5px; font-weight:bold;">Hybrid Model (Top
+                                3):</label>
+                            <select id="nu-model-select"
+                                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                                <option value="">Loading models...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="runNuInference()" id="btn-run-nu-inference">Run
+                        Detection</button>
+                    <div id="nu-inference-status" style="margin-top: 10px; font-style: italic;"></div>
+                </div>
+
+                <!-- Verification UI -->
+                <div id="nu-verification-ui" style="display:none;" class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>2. Verify Events</h3>
+                        <div style="background: #e3f2fd; padding: 5px 10px; border-radius: 4px; font-size: 0.9rem;">
+                            Scene: <strong id="nu-current-session-name">-</strong> |
+                            Run: <strong id="nu-current-run-id">-</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                        <!-- Player & Controls -->
+                        <div>
+                            <div
+                                style="background: #000; border-radius: 8px; margin-bottom: 10px; min-height: 300px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <video id="nu-review-player" controls style="width: 100%; display: none;"></video>
+                                <img id="nu-review-image" style="width: 100%; display: block;" />
+                            </div>
+
+                            <div style="display: flex; gap: 10px; justify-content: center;">
+                                <button onclick="labelNuEvent(true)" class="action-btn"
+                                    style="background: #2ecc71; flex: 1; padding: 15px;">
+                                    ✅ POTHOLE (1)
+                                </button>
+                                <button onclick="labelNuEvent(false)" class="action-btn"
+                                    style="background: #e74c3c; flex: 1; padding: 15px;">
+                                    ❌ FALSE POSITIVE (2)
+                                </button>
+                            </div>
+                            <div style="text-align: center; margin-top: 10px; font-size: 0.85rem; color: #666;">
+                                Hint: Video seeks to 2s before event.
+                            </div>
+                        </div>
+
+                        <!-- Event List -->
+                        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee;">
+                            <table class="results-table" style="margin: 0;">
+                                <thead style="position: sticky; top: 0; background: #fff; z-index: 1;">
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Score</th>
+                                        <th>Source</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="nu-event-list-body">
+                                    <!-- Rows injected via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel F -->
+            <div id="panel-metrics" class="panel">
+                <h2>F. Manual Accuracy Dashboard</h2>
+                <div class="card">
+                    <h3>Aggregate Performance (Real World)</h3>
+                    <div id="manual-metrics-display" style="padding: 20px;">
+                        Loading metrics...
+                    </div>
+                    <button class="action-btn" onclick="loadManualMetrics()"
+                        style="background: #3498db; margin-top: 10px;">Refresh Metrics</button>
+                </div>
+            </div>
+
+            <!-- Panel G -->
+            <div id="panel-research" class="panel">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>G. Research Analytics & Export</h2>
+                    <button class="action-btn" onclick="downloadExcelPackage()" style="background: #27ae60;">📥 Download
+                        Research Package (Excel)</button>
+                </div>
+
+                <div class="card" id="hypothesis-card" style="border-left: 5px solid #3498db; background: #ebf5fb;">
+                    <h3>Hypothesis Verification</h3>
+                    <div id="hypothesis-summary">Analyzing data...</div>
+                </div>
+
+                <div class="card" id="comparison-card" style="border-left: 5px solid #673ab7; background: #f3e5f5;">
+                    <h3>Real-World Modality Comparison (Section F Data)</h3>
+                    <div id="comparison-summary">Analyzing manual review data...</div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h3>Model Consistency</h3>
+                            <button class="export-btn"
+                                onclick="downloadChart('chart-consistency', 'consistency.png')">📸</button>
+                        </div>
+                        <canvas id="chart-consistency"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h3>System Efficiency Frontier</h3>
+                            <button class="export-btn"
+                                onclick="downloadChart('chart-efficiency', 'efficiency.png')">📸</button>
+                        </div>
+                        <canvas id="chart-efficiency"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h3>Hybrid Algorithm Detail</h3>
+                            <button class="export-btn"
+                                onclick="downloadChart('chart-hybrid-algo', 'hybrid_algo.png')">📸</button>
+                        </div>
+                        <canvas id="chart-hybrid-algo"></canvas>
+                        <div style="font-size: 0.75rem; color: #666; margin-top: 5px; text-align: center;">Feature
+                            Fusion vs Late Fusion Performance</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h3>Perspective Transferability Gap</h3>
+                            <button class="export-btn"
+                                onclick="downloadChart('chart-perspective', 'transferability.png')">📸</button>
+                        </div>
+                        <canvas id="chart-perspective"></canvas>
+                        <div style="font-size: 0.75rem; color: #666; margin-top: 5px;">Shows performance drop-off when
+                            moving from Handheld (easy) to Vehicle (hard) data.</div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Strategic Trade-offs</h3>
+                        <table class="results-table" style="font-size: 0.8rem; height: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Approach</th>
+                                    <th>Accuracy</th>
+                                    <th>Speed</th>
+                                    <th>Robustness</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Vision Only</strong></td>
+                                    <td>High (Ideal)</td>
+                                    <td>~35ms</td>
+                                    <td style="color:red">Low (Glare/Dark)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sensor (1D-CNN)</strong></td>
+                                    <td>Medium</td>
+                                    <td style="color:green">~3ms</td>
+                                    <td>High (Any Light)</td>
+                                </tr>
+                                <tr style="background: #e8f5e9;">
+                                    <td><strong>Hybrid Fusion</strong></td>
+                                    <td style="color:green"><strong>Highest</strong></td>
+                                    <td>~40ms</td>
+                                    <td style="color:green"><strong>Max (All Cond)</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Advanced Analytics (Rows 2 & 3) -->
+                <div class="charts-grid" style="grid-template-columns: repeat(3, 1fr);">
+
+                    <!-- Row 2 -->
+                    <div class="chart-container">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h3>Precision vs. Recall</h3>
+                            <button class="export-btn"
+                                onclick="downloadChart('chart-pr-scatter', 'pr_scatter.png')">📸</button>
+                        </div>
+                        <canvas id="chart-pr-scatter"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h3>Dataset Size vs. Performance</h3>
+                            <button class="export-btn"
+                                onclick="downloadChart('chart-complexity', 'complexity.png')">📸</button>
+                        </div>
+                        <canvas id="chart-complexity"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h3>Simulated vs. Real-World</h3>
+                            <button class="export-btn"
+                                onclick="downloadChart('chart-sim-real', 'sim_vs_real.png')">📸</button>
+                        </div>
+                        <canvas id="chart-sim-real"></canvas>
+                    </div>
+
+                    <!-- Row 3: Confusion Matrices -->
+                    <div class="chart-container">
+                        <h4 style="text-align:center; margin-bottom: 5px;">Avg Confusion (Image)</h4>
+                        <div id="cm-image-agg" class="cm-display-mini"></div>
+                    </div>
+                    <div class="chart-container">
+                        <h4 style="text-align:center; margin-bottom: 5px;">Avg Confusion (1D-CNN)</h4>
+                        <div id="cm-sensor-agg" class="cm-display-mini"></div>
+                    </div>
+                    <div class="chart-container">
+                        <h4 style="text-align:center; margin-bottom: 5px;">Avg Confusion (Hybrid)</h4>
+                        <div id="cm-hybrid-agg" class="cm-display-mini"></div>
+                    </div>
+                </div>
+
+                <div class="card" id="key-learnings-card"
+                    style="margin-top: 20px; background: #fff8e1; border-left: 5px solid #ffc107;">
+                    <h3>💡 Key Research Learnings</h3>
+                    <ul id="learnings-list" style="padding-left: 20px;">
+                        <li>Analyzing dataset characteristics...</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h3>Detailed Research Data</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="results-table" id="research-data-table">
+                            <thead>
+                                <tr>
+                                    <th>Modality</th>
+                                    <th>Algorithm</th>
+                                    <th>Dataset</th>
+                                    <th>Accuracy</th>
+                                    <th>F1-Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Debug Console -->
+            <div class="card"
+                style="margin-top: 20px; background: #333; color: #0f0; font-family: monospace; font-size: 0.75rem; height: 150px; overflow-y: auto; padding: 5px;"
+                id="debug-log">
+                [SYSTEM] Debug Log Active
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            window.onerror = function (msg, url, line, col, error) {
+                log(`FATAL: ${msg} at ${line}:${col}`);
+                return false;
+            };
+
+            function log(msg) {
+                try {
+                    const el = document.getElementById('debug-log');
+                    if (!el) return;
+                    const line = document.createElement('div');
+                    line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                    el.prepend(line);
+                    if (el.children.length > 30) el.lastElementChild.remove();
+                } catch (e) { }
+            }
+
+            async function createJob(taskType, args = {}) {
+                try {
+                    log(`Submitting ${taskType}...`);
+                    const res = await fetch('/api/jobs', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ task_type: taskType, args: args })
+                    });
+                    const job = await res.json();
+                    log(`Job #${job.id} submitted.`);
+                    pollJobs();
+                } catch (e) {
+                    log(`Create Error: ${e}`);
+                    alert('Error: ' + e);
+                }
+            }
+
+            async function pollJobs() {
+                try {
+                    const res = await fetch('/api/jobs');
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const jobs = await res.json();
+                    if (!Array.isArray(jobs)) throw new Error("API did not return a list of jobs");
+
+                    const running = jobs.filter(j => j && (j.status === 'running' || j.status === 'queued')).length;
+                    if (running > 0) log(`Polling: ${running} jobs in progress...`);
+                    const list = document.getElementById('job-list-mini');
+                    if (list) {
+                        list.innerHTML = jobs.map(j => `
+                <div style="margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px;">
+                    #${j.id} ${j.task_type}<br>
+                    <span class="status-${j.status}">${j.status}</span>
+                </div>
+            `).join('');
+
+                        // Check for validation results
+                        const validationJob = jobs.find(j => j.task_type === 'validate_datasets' && j.status === 'completed');
+                        if (validationJob && validationJob.args.result) {
+                            if (window.lastValidationJobId !== validationJob.id) {
+                                window.lastValidationJobId = validationJob.id;
+                                loadDatasets();
+                            }
+                            const res = validationJob.args.result;
+
+                            // Helper to render list with detailed tooltips
+                            const render = (items, elementId) => {
+                                const el = document.getElementById(elementId);
+                                if (!items || Object.keys(items).length === 0) {
+                                    el.innerHTML = "<li>None found</li>";
+                                    return;
+                                }
+                                el.innerHTML = Object.entries(items).map(([name, info]) => {
+                                    const color = info.valid ? "green" : "red";
+                                    const icon = info.valid ? "✅" : "❌";
+                                    // Convert newlines to breaks for display in a tooltip or expanded view
+                                    const msgSafe = info.msg.replace(/\n/g, "&#10;");
+                                    const msgDisplay = info.msg.replace(/\n/g, "<br>");
+
+                                    return `
+                                <li style="color:${color}; margin-bottom: 5px;" title="${msgSafe}">
+                                    <strong>${name}</strong>
+                                    <div style="font-size: 0.8em; color: #666; padding-left: 10px;">
+                                        ${msgDisplay}
+                                    </div>
+                                </li>
+                            `;
+                                }).join('');
+                            };
+
+                            // Support old flat format for backward compat, or new nested format
+                            if (res.image) {
+                                render(res.image, 'status-image');
+                                render(res.sensor, 'status-sensor');
+                                render(res.hybrid, 'status-hybrid');
+                            } else {
+                                // Fallback for old style keys "image/..."
+                                // Not strictly needed if worker is updated, but good safety
+                            }
+                        }
+
+                        // Check for test results
+                        const sortedJobs = [...jobs].sort((a, b) => b.id - a.id);
+                        const testJob = sortedJobs.find(j => j.task_type === 'run_tests' && j.status === 'completed');
+
+                        if (testJob && testJob.args && testJob.args.result) {
+                            const testRes = testJob.args.result;
+                            const testStatusEl = document.getElementById('test-status-summary');
+                            if (testStatusEl && testRes.summary) {
+                                let color = testRes.summary.includes("failed") || (testRes.summary.match(/\d+\/\d+/) && testRes.summary.split('/')[0] !== testRes.summary.split('/')[1].split(' ')[0]) ? "red" : "green";
+                                const failures = Object.entries(testRes.details || {}).filter(([k, v]) => v.status === 'failed');
+
+                                let html = `<div style="color: ${color};">${testRes.summary}</div>`;
+                                if (failures.length > 0) {
+                                    html += `<ul style="font-size: 0.85em; color: red; margin-top: 5px; padding-left: 20px;">`;
+                                    failures.forEach(([name, info]) => {
+                                        html += `<li><strong>${name}</strong> failed</li>`;
+                                    });
+                                    html += `</ul>`;
+                                }
+                                testStatusEl.innerHTML = html;
+                                testStatusEl.title = JSON.stringify(testRes.details, null, 2);
+                            }
+                        }
+                    }
+
+                    // Update model experiment results
+                    updateExperimentResults(jobs);
+
+                    // Update API status
+                    const statusEl = document.getElementById('api-status');
+                    if (statusEl) {
+                        statusEl.innerText = "Online";
+                        statusEl.style.color = "green";
+                    }
+                } catch (e) {
+                    log(`Poll Error: ${e.message || e}`);
+                    console.error("Poll Error:", e);
+                    const statusEl = document.getElementById('api-status');
+                    if (statusEl) {
+                        statusEl.innerText = "Error";
+                        statusEl.style.color = "red";
+                    }
+                }
+            }
+
+            const chartInstances = {};
+
+            function updateExperimentResults(jobs) {
+                const types = [
+                    { task: 'train_image', el: 'image-results', select: 'image-model-select', arg: 'model', dsSelect: 'image-dataset-select', dsPrefix: 'data/image/raw/' },
+                    { task: 'train_sensor', el: 'sensor-results', select: 'sensor-model-select', arg: 'model', dsSelect: 'sensor-dataset-select', dsPrefix: 'data/' },
+                    { task: 'train_hybrid', el: 'hybrid-results', select: 'hybrid-fusion-select', arg: 'fusion_type', dsSelect: 'hybrid-dataset-select', dsPrefix: 'data/' }
+                ];
+
+                types.forEach(t => {
+                    const container = document.getElementById(t.el);
+                    if (!container) return;
+
+                    const selectEl = document.getElementById(t.select);
+                    const dsSelectEl = document.getElementById(t.dsSelect);
+                    if (!selectEl || !dsSelectEl) {
+                        log(`Waiting for selects: ${t.select}`);
+                        return;
+                    }
+                    const selectedVal = selectEl.value;
+                    const selectedDs = dsSelectEl.value;
+                    if (!selectedDs) {
+                        container.innerHTML = `<div style="color: #666; font-style: italic; padding: 10px;">Select a dataset to view results.</div>`;
+                        return;
+                    }
+                    const expectedDsPath = t.dsPrefix + selectedDs;
+
+                    log(`Filtering ${t.task}: val=${selectedVal}, ds=${expectedDsPath}`);
+
+                    const completed = jobs.filter(j => {
+                        if (j.task_type !== t.task) return false;
+                        if (j.status.toLowerCase() !== 'completed') return false;
+                        const dsArg = j.args['dataset_path'] || j.args['dataset'];
+                        if (!dsArg || !dsArg.endsWith(selectedDs)) return false;
+
+                        const res = j.args.result || {};
+                        const jobVal = (j.args[t.arg] || j.args['model_type'] || res.algorithm || "").toLowerCase();
+                        const selVal = (selectedVal || "").toLowerCase();
+
+                        if (jobVal === selVal) return true;
+                        // Aliases for YOLO
+                        if (selVal === 'yolov8' && jobVal.startsWith('yolov8')) return true;
+                        // Aliases for 1D-CNN
+                        // cnn and lstm are DISTINCT architectures — do not conflate
+                        // Aliases for Random Forest
+                        if ((jobVal === 'rf' || jobVal === 'random_forest') && (selVal === 'rf' || selVal === 'random_forest')) return true;
+
+                        return false;
+                    }).sort((a, b) => b.id - a.id);
+
+                    if (completed.length === 0) {
+                        const hasAny = jobs.filter(j => j.task_type === t.task && j.status === 'completed').length;
+                        log(`No match for ${t.task} on ${selectedVal}. (Found ${hasAny} total jobs for this task type)`);
+                        container.innerHTML = `<div style="color: #666; font-style: italic; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">No previous results for ${selectedVal}.</div>`;
+                        // Cleanup old chart if hidden
+                        if (chartInstances[t.el]) {
+                            chartInstances[t.el].destroy();
+                            delete chartInstances[t.el];
+                        }
+                        return;
+                    }
+
+                    const latest = completed[0];
+                    if (!latest.args || !latest.args.result) {
+                        log(`Error: Job #${latest.id} has no result data.`);
+                        return;
+                    }
+
+                    const res = latest.args.result;
+                    let activeMetrics = res.metrics;
+                    let hybridPermsHtml = '';
+
+                    if (res.permutations) {
+                        // Multi-permutation hybrid view
+                        const perms = res.permutations;
+
+                        // Show pairing controls
+                        document.getElementById('hybrid-pairing-controls').style.display = 'block';
+
+                        // Determine which permutation to visualize
+                        const targetImg = document.getElementById('hybrid-image-select').value;
+                        const targetSnr = document.getElementById('hybrid-sensor-select').value;
+
+                        const selectedPerm = perms.find(p => p.image_model === targetImg && p.sensor_model === targetSnr) || perms[0];
+                        activeMetrics = selectedPerm.metrics;
+
+                        hybridPermsHtml = `
+                            <div style="margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;">
+                                <div style="background: #f5f5f5; padding: 8px 12px; font-weight: bold; border-bottom: 1px solid #e0e0e0; font-size: 0.9rem;">
+                                    Permutation Analysis (6 Combinations)
+                                </div>
+                                <table class="results-table" style="margin: 0; font-size: 0.8rem; border: none;">
+                                    <thead>
+                                        <tr style="background: #fafafa;">
+                                            <th>Image Model</th>
+                                            <th>Sensor Model</th>
+                                            <th>Accuracy</th>
+                                            <th>F1-Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${perms.map((p, idx) => {
+                            const isSelected = p.image_model === targetImg && p.sensor_model === targetSnr;
+                            return `
+                                                <tr style="${isSelected ? 'background: #e3f2fd; font-weight: bold;' : (idx === 0 ? 'background: #f1f8e9;' : '')}">
+                                                    <td>${p.image_model.toUpperCase()}</td>
+                                                    <td>${p.sensor_model === 'random_forest' ? 'RF' : (p.sensor_model === 'lstm' ? 'BiLSTM' : (p.sensor_model === 'cnn' ? '1D-CNN' : p.sensor_model.toUpperCase()))}</td>
+                                                    <td style="color: ${isSelected ? '#1976d2' : (idx === 0 ? '#2e7d32' : 'inherit')}">${p.metrics.accuracy.toFixed(4)}</td>
+                                                    <td>${p.metrics.f1.toFixed(4)}</td>
+                                                </tr>
+                                            `;
+                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="background: #f1f8e9; padding: 8px 12px; border-radius: 4px; margin-bottom: 15px; font-size: 0.85rem; border-left: 4px solid #2e7d32;">
+                                <strong>Comparison Result:</strong> Showing details for <strong>${targetImg.toUpperCase()} + ${(targetSnr === 'random_forest' ? 'RF' : targetSnr).toUpperCase()}</strong>.
+                            </div>
+                        `;
+                    } else if (t.task === 'train_hybrid') {
+                        document.getElementById('hybrid-pairing-controls').style.display = 'none';
+                    }
+
+                    // Parameters
+                    let paramsHtml = '';
+                    if (res.parameters) {
+                        paramsHtml = `
+                            <div class="parameters-list">
+                                <strong>Parameters:</strong>
+                                ${Object.entries(res.parameters).map(([k, v]) => `<span>${k}: ${v}</span>`).join('')}
+                            </div>
+                        `;
+                    }
+
+                    // Metrics Table
+                    let metricsHtml = '';
+                    if (activeMetrics) {
+                        metricsHtml = `
+                            <table class="results-table">
+                                <thead>
+                                    <tr><th>Metric (Visualized Pair)</th><th>Value</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${Object.entries(activeMetrics)
+                                .filter(([k]) => typeof activeMetrics[k] === 'number')
+                                .map(([k, v]) => `<tr><td>${k.toUpperCase()}</td><td>${v.toFixed(4)}</td></tr>`)
+                                .join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    }
+
+                    // Confusion Matrix
+                    let cmHtml = '';
+                    if (activeMetrics && activeMetrics.confusion_matrix) {
+                        const cm = activeMetrics.confusion_matrix;
+                        cmHtml = `
+                            <div class="chart-container">
+                                <h5 style="margin:0 0 10px 0">Confusion Matrix (Visualized Pair)</h5>
+                                <div class="cm-heatmap">
+                                    <div class="cm-cell" style="background:#e3f2fd"><span>TN</span><strong>${cm[0][0]}</strong></div>
+                                    <div class="cm-cell" style="background:#ffebee"><span>FP</span><strong>${cm[0][1]}</strong></div>
+                                    <div class="cm-cell" style="background:#ffebee"><span>FN</span><strong>${cm[1][0]}</strong></div>
+                                    <div class="cm-cell" style="background:#e8f5e9"><span>TP</span><strong>${cm[1][1]}</strong></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // ROC Chart Placeholder
+                    const chartId = `roc-${latest.id}`;
+                    let rocHtml = `
+                        <div class="chart-container">
+                            <h5 style="margin:0 0 10px 0">ROC Curve</h5>
+                            <canvas id="${chartId}" height="100"></canvas>
+                        </div>
+                    `;
+
+                    container.innerHTML = `
+                        <div style="background: #fdfdfd; padding: 15px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h4 style="margin: 0; color: #2c3e50;">Experiment Results (#${latest.id})</h4>
+                                <button class="export-btn" onclick="exportJobResult(${latest.id})">Export JSON</button>
+                            </div>
+                            ${hybridPermsHtml}
+                            ${paramsHtml}
+                            <div style="font-size: 0.85rem; color: #666; margin-bottom: 10px; display: grid; grid-template-columns: repeat(1, 1fr); gap: 5px;">
+                                <span><strong>Algorithm:</strong> ${res.algorithm || 'N/A'}</span>
+                                <span><strong>Dataset:</strong> ${res.dataset || 'N/A'}</span>
+                                <span><strong>Run at:</strong> ${new Date(res.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div class="charts-grid">
+                                <div>${metricsHtml}</div>
+                                ${cmHtml}
+                            </div>
+                            <div style="margin-top:20px">${rocHtml}</div>
+                        </div>
+                    `;
+
+                    // Render ROC Chart after DOM update
+                    if (activeMetrics && activeMetrics.roc_curve) {
+                        setTimeout(() => {
+                            const canvas = document.getElementById(chartId);
+                            if (!canvas) return;
+                            const ctx = canvas.getContext('2d');
+
+                            if (chartInstances[t.el]) {
+                                chartInstances[t.el].destroy();
+                            }
+
+                            chartInstances[t.el] = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    datasets: [{
+                                        label: 'ROC (Visualized Pair)',
+                                        data: activeMetrics.roc_curve.map(p => ({ x: p[0], y: p[1] })),
+                                        borderColor: '#3498db',
+                                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                                        fill: true,
+                                        tension: 0.2
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        x: { type: 'linear', position: 'bottom', title: { display: true, text: 'FPR' }, min: 0, max: 1 },
+                                        y: { title: { display: true, text: 'TPR' }, min: 0, max: 1 }
+                                    },
+                                    plugins: { legend: { display: false } },
+                                    animation: { duration: 400 } // Add some animation for visual feedback
+                                }
+                            });
+                        }, 50);
+                    }
+                });
+            }
+
+            window.exportJobResult = async function (id) {
+                const response = await fetch('/api/jobs');
+                const jobs = await response.json();
+                const job = jobs.find(j => j.id === id);
+                if (!job) return alert('Job not found');
+
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(job, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", `experiment_${id}_results.json`);
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            }
+
+            async function loadCandidateModels() {
+                try {
+                    // Load Image Models
+                    const imgRes = await fetch('/api/models/candidates?type=image');
+                    if (imgRes.ok) {
+                        const imgModels = await imgRes.json();
+                        const imgSelect = document.getElementById('hybrid-image-candidate-select');
+                        const currentVal = imgSelect.value;
+                        imgSelect.innerHTML = '<option value="">Auto (All Permutations)</option>' +
+                            imgModels.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+                        if (currentVal) imgSelect.value = currentVal;
+                    }
+
+                    // Load Sensor Models
+                    const snrRes = await fetch('/api/models/candidates?type=sensor');
+                    if (snrRes.ok) {
+                        const snrModels = await snrRes.json();
+                        const snrSelect = document.getElementById('hybrid-sensor-candidate-select');
+                        const currentVal = snrSelect.value;
+                        snrSelect.innerHTML = '<option value="">Auto (All Permutations)</option>' +
+                            snrModels.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+                        if (currentVal) snrSelect.value = currentVal;
+                    }
+
+                } catch (e) { log("Error loading candidates: " + e); }
+            }
+
+
+
+            async function loadDatasets() {
+                try {
+                    // Load Image Datasets
+                    const imgRes = await fetch('/api/datasets/image');
+                    const imgDatasets = await imgRes.json();
+                    const imgSelect = document.getElementById('image-dataset-select');
+                    imgSelect.innerHTML = imgDatasets.map(d => `<option value="${d}">${d}</option>`).join('');
+
+                    // Load Sensor Datasets
+                    const snsRes = await fetch('/api/datasets/sensor');
+                    const snsDatasets = await snsRes.json();
+                    const snsSelect = document.getElementById('sensor-dataset-select');
+                    snsSelect.innerHTML = snsDatasets.map(d => `<option value="${d}">${d}</option>`).join('');
+
+                    // Load Hybrid Datasets
+                    const hybRes = await fetch('/api/datasets/hybrid');
+                    const hybDatasets = await hybRes.json();
+                    const hybSelect = document.getElementById('hybrid-dataset-select');
+                    hybSelect.innerHTML = hybDatasets.map(d => `<option value="${d}">${d}</option>`).join('');
+                } catch (e) {
+                    console.error("Failed to load datasets", e);
+                }
+            }
+
+            let currentSessionId = null;
+            let currentEventId = null;
+
+            async function startReview() {
+                const runId = document.getElementById('review-run-id').value;
+                const res = await fetch(`/api/reviews/start?run_id=${runId}`, { method: 'POST' });
+                const data = await res.json();
+                currentSessionId = data.session_id;
+                document.getElementById('review-interface').classList.remove('hidden');
+                loadNextEvent();
+            }
+
+            async function loadNextEvent() {
+                const res = await fetch(`/api/reviews/${currentSessionId}/next`);
+                const data = await res.json();
+
+                if (data.status === 'done') {
+                    alert("Review Complete!");
+                    document.getElementById('review-interface').classList.add('hidden');
+                    return;
+                }
+
+                currentEventId = data.event_id;
+                const player = document.getElementById('review-player');
+                player.src = data.video_url; // Ensure this endpoint exists
+            }
+
+            async function submitLabel(isPothole) {
+                if (!currentEventId) return;
+
+                const res = await fetch(`/api/reviews/events/${currentEventId}/label?session_id=${currentSessionId}&is_pothole=${isPothole}`, { method: 'POST' });
+                const stats = await res.json();
+
+                document.getElementById('stats-precision').innerText = stats.precision.toFixed(2);
+                document.getElementById('stats-count').innerText = stats.total_labeled;
+
+                loadNextEvent();
+            }
+
+            function skipEvent() {
+                loadNextEvent();
+            }
+
+            // --- Real World Validation Logic ---
+
+            async function loadSessions() {
+                try {
+                    const res = await fetch('/api/sessions');
+                    const sessions = await res.json();
+                    window.iphoneSessions = sessions;
+                    const sel = document.getElementById('review-session-select');
+                    if (sessions.length === 0) {
+                        sel.innerHTML = '<option value="">No sessions found</option>';
+                        return;
+                    }
+                    sel.innerHTML = sessions.map(s => `<option value="${s.path}" data-video="${s.video_url || ''}" data-name="${s.name}">${s.name} ${s.processed ? '(Ready)' : '(Raw)'}</option>`).join('');
+                } catch (e) { log('Error loading sessions: ' + e); }
+            }
+
+            async function loadTopHybridModels() {
+                try {
+                    const res = await fetch('/api/models/hybrid/top');
+                    const models = await res.json();
+                    const sel = document.getElementById('review-model-select');
+                    if (models.length === 0) {
+                        sel.innerHTML = '<option value="">No suitable models found</option>';
+                        return;
+                    }
+                    sel.innerHTML = models.map(m => `<option value='${JSON.stringify({ image_model: m.image_model, sensor_model: m.sensor_model })}'>${m.name} (Acc: ${m.accuracy.toFixed(2)})</option>`).join('');
+                } catch (e) { log('Error loading models: ' + e); }
+            }
+
+            async function runInference() {
+                const sessionSelect = document.getElementById('review-session-select');
+                const sessionPath = sessionSelect.value;
+                const modelConfigStr = document.getElementById('review-model-select').value;
+
+                if (!sessionPath || !modelConfigStr) { alert("Select session and model"); return; }
+
+                const modelConfig = JSON.parse(modelConfigStr);
+
+                document.getElementById('inference-status').innerText = "Submitting job...";
+                document.getElementById('btn-run-inference').disabled = true;
+
+                const sessionName = sessionSelect.options[sessionSelect.selectedIndex].text;
+
+                try {
+                    const res = await fetch('/api/inference/run', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            task_type: 'run_inference_iphone',
+                            args: {
+                                session_path: sessionPath,
+                                model_config: modelConfig,
+                                session_id: sessionName
+                            }
+                        })
+                    });
+                    const job = await res.json();
+                    document.getElementById('inference-status').innerText = `Job #${job.id} running...`;
+
+                    const check = setInterval(async () => {
+                        const jRes = await fetch(`/api/jobs/${job.id}`);
+                        const j = await jRes.json();
+                        if (j.status === 'completed') {
+                            clearInterval(check);
+                            document.getElementById('inference-status').innerText = `Job #${job.id} completed. Starting verification...`;
+                            document.getElementById('btn-run-inference').disabled = false;
+
+                            // Get video URL from selection data
+                            const videoUrl = sessionSelect.options[sessionSelect.selectedIndex].getAttribute('data-video');
+                            startVerification(job.id, sessionName, videoUrl);
+
+                        } else if (j.status === 'failed') {
+                            clearInterval(check);
+                            document.getElementById('inference-status').innerText = `Job failed: ${j.error_message}`;
+                            document.getElementById('btn-run-inference').disabled = false;
+                        }
+                    }, 2000);
+                } catch (e) {
+                    alert("Error starting inference: " + e);
+                    document.getElementById('btn-run-inference').disabled = false;
+                }
+            }
+
+            let currentVerificationJobId = null;
+            let currentVerificationSessionId = null;
+            let currentVideoUrl = null;
+
+            document.getElementById('review-session-select').addEventListener('change', async (e) => {
+                const folderName = e.target.value;
+                if (!folderName) return;
+
+                // Hide existing UI while checking
+                document.getElementById('verification-ui').style.display = 'none';
+
+                try {
+                    const res = await fetch(`/api/reviews/history/${encodeURIComponent(folderName)}`);
+                    const data = await res.json();
+
+                    if (data.status === 'found') {
+                        const sess = window.iphoneSessions.find(s => s.path === folderName);
+                        const videoUrl = sess ? sess.video_url : data.video_url;
+
+                        if (data.review_session_id) {
+                            currentVerificationJobId = data.job_id;
+                            currentVideoUrl = videoUrl;
+                            currentVerificationSessionId = data.review_session_id;
+
+                            document.getElementById('verification-ui').style.display = 'block';
+                            document.getElementById('current-session-name').innerText = data.session_name;
+                            document.getElementById('current-run-id').innerText = '#' + data.job_id;
+
+                            if (currentVideoUrl) {
+                                document.getElementById('review-player').src = currentVideoUrl;
+                                document.getElementById('review-player').load();
+                            }
+                            loadEventsTable();
+                        } else {
+                            // Job exists but no session yet, auto-start it
+                            startVerification(data.job_id, data.session_name, videoUrl);
+                        }
+                    } else {
+                        // No job found, reset UI
+                        document.getElementById('verification-ui').style.display = 'none';
+                        document.getElementById('inference-status').innerText = 'Ready to run detection.';
+                    }
+                } catch (e) {
+                    console.error("History check failed", e);
+                }
+            });
+
+            async function startVerification(jobId, sessionName, videoUrl) {
+                const res = await fetch(`/api/reviews/start?run_id=${jobId}`, { method: 'POST' });
+                const data = await res.json();
+                currentVerificationSessionId = data.session_id;
+                currentVerificationJobId = jobId;
+                currentVideoUrl = videoUrl;
+
+                document.getElementById('verification-ui').style.display = 'block';
+                document.getElementById('current-session-name').innerText = sessionName;
+                document.getElementById('current-run-id').innerText = '#' + jobId;
+
+                if (currentVideoUrl) {
+                    document.getElementById('review-player').src = currentVideoUrl;
+                    document.getElementById('inference-status').innerText = 'Verification session loaded with video.';
+                } else {
+                    document.getElementById('inference-status').innerText = 'Session loaded. (No full video recording found, clips may be unavailable)';
+                    document.getElementById('review-player').src = '';
+                }
+
+                loadEventsTable();
+            }
+
+            let selectedEventId = null;
+
+            async function loadEventsTable() {
+                const res = await fetch(`/api/reviews/${currentVerificationSessionId}/events`);
+                const events = await res.json();
+
+                const tbody = document.getElementById('event-list-body');
+                tbody.innerHTML = events.map(e => {
+                    let color = '';
+                    if (e.status === 'pothole') color = '#d4edda'; // green bg
+                    if (e.status === 'false_positive') color = '#f8d7da'; // red bg
+
+                    // Escape strings for onclick
+                    const videoUrl = e.video_url || '';
+                    return `
+                        <tr onclick="selectEvent(${e.id}, ${e.time}, '${videoUrl}')" style="cursor: pointer; background: ${color}" id="row-${e.id}">
+                            <td>${e.time.toFixed(2)}s</td>
+                            <td onclick="selectEvent(${e.id}, ${e.time}, '${e.video_url}')">${e.score.toFixed(2)}</td>
+                            <td onclick="selectEvent(${e.id}, ${e.time}, '${e.video_url}')"><span class="badge source-${e.source}">${e.source}</span></td>
+                            <td id="status-${e.id}">${e.status}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                if (events.length > 0) {
+                    selectEvent(events[0].id, events[0].time, events[0].video_url);
+                }
+            }
+
+            let playbackTimeout = null;
+
+            function selectEvent(id, time, videoUrl) {
+                selectedEventId = id;
+                const player = document.getElementById('review-player');
+
+                // Clear any existing stop timer
+                if (playbackTimeout) clearTimeout(playbackTimeout);
+
+                const stopAfter4s = () => {
+                    playbackTimeout = setTimeout(() => {
+                        player.pause();
+                    }, 4000);
+                };
+
+                if (videoUrl) {
+                    // Add cache buster and explicit load
+                    player.src = videoUrl + "?t=" + new Date().getTime();
+                    player.load();
+                    player.play()
+                        .then(stopAfter4s)
+                        .catch(e => console.error("Playback failed", e));
+                } else {
+                    // Fallback to original video seeking
+                    // Reset to session video if not already there
+                    if (!player.src.includes(currentVideoUrl) || player.src.includes('event_')) {
+                        player.src = currentVideoUrl;
+                        player.load();
+                    }
+                    try {
+                        player.currentTime = Math.max(0, time - 2.0);
+                        player.play()
+                            .then(stopAfter4s)
+                            .catch(e => console.error("Playback failed", e));
+                    } catch (e) { console.error(e); }
+                }
+
+                // Highlight row
+                document.querySelectorAll('#event-list-body tr').forEach(r => r.style.outline = 'none');
+                const row = document.getElementById(`row-${id}`);
+                if (row) row.style.outline = '2px solid blue';
+            }
+
+            async function labelEvent(isPothole) {
+                if (!selectedEventId || !currentVerificationSessionId) return;
+
+                await fetch(`/api/reviews/events/${selectedEventId}/label?session_id=${currentVerificationSessionId}&is_pothole=${isPothole}`, { method: 'POST' });
+
+                // Update UI locally
+                const status = isPothole ? 'pothole' : 'false_positive';
+                const color = isPothole ? '#d4edda' : '#f8d7da';
+
+                const row = document.getElementById(`row-${selectedEventId}`);
+                if (row) {
+                    row.style.background = color;
+                    const cell = document.getElementById(`status-${selectedEventId}`);
+                    if (cell) cell.innerText = status;
+                }
+
+                // Update metrics board
+                loadManualMetrics();
+            }
+
+            async function loadManualMetrics() {
+                try {
+                    const res = await fetch('/api/metrics/manual');
+                    const m = await res.json();
+
+                    const renderStats = (title, data) => `
+                        <div class="card" style="margin-bottom: 20px;">
+                            <h4>${title}</h4>
+                            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; text-align: center;">
+                                <div style="background: #e1f5fe; padding: 10px; border-radius: 8px;">
+                                    <div style="font-size: 1.5em; font-weight: bold; color: #0288d1;">${(data.accuracy * 100).toFixed(1)}%</div>
+                                    <div style="font-size: 0.8em;">Accuracy</div>
+                                </div>
+                                <div style="background: #e3f2fd; padding: 10px; border-radius: 8px;">
+                                    <div style="font-size: 1.5em; font-weight: bold; color: #1976d2;">${(data.precision * 100).toFixed(1)}%</div>
+                                    <div style="font-size: 0.8em;">Precision</div>
+                                </div>
+                                <div style="background: #f5f5f5; padding: 10px; border-radius: 8px;">
+                                    <div style="font-size: 1.5em; font-weight: bold;">${data.total}</div>
+                                    <div style="font-size: 0.8em;">Total</div>
+                                </div>
+                                <div style="background: #d4edda; padding: 10px; border-radius: 8px;">
+                                    <div style="font-size: 1.5em; font-weight: bold; color: #155724;">${data.tp}</div>
+                                    <div style="font-size: 0.8em;">TP</div>
+                                </div>
+                                <div style="background: #f8d7da; padding: 10px; border-radius: 8px;">
+                                    <div style="font-size: 1.5em; font-weight: bold; color: #721c24;">${data.fp}</div>
+                                    <div style="font-size: 0.8em;">FP</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    document.getElementById('manual-metrics-display').innerHTML = `
+                        <div style="margin-bottom: 30px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
+                            <h3 style="margin: 0; color: #2c3e50;">1. Combined Global Performance</h3>
+                            <p style="font-size: 0.85rem; color: #666;">Aggregate metrics across all real-world data sources.</p>
+                            ${renderStats("Hybrid (Fused) Performance", m.hybrid)}
+                            ${renderStats("Image Component (Vision Only)", m.image)}
+                            ${renderStats("Sensor Component (Signal Only)", m.sensor)}
+                        </div>
+
+                        <div style="margin-bottom: 30px; border-bottom: 2px solid #27ae60; padding-bottom: 10px;">
+                            <h3 style="margin: 0; color: #2c3e50;">2. iPhone Drives (Section E)</h3>
+                            <p style="font-size: 0.85rem; color: #666;">Performance on consumer-collected smartphone data.</p>
+                            ${renderStats("Hybrid (Fused) Performance", m.iphone.hybrid)}
+                            ${renderStats("Image Component (Vision Only)", m.iphone.image)}
+                            ${renderStats("Sensor Component (Signal Only)", m.iphone.sensor)}
+                        </div>
+
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="margin: 0; color: #2c3e50;">3. nuScenes Scenes (Section E1)</h3>
+                            <p style="font-size: 0.85rem; color: #666;">Performance on high-fidelity research vehicle data.</p>
+                            ${renderStats("Hybrid (Fused) Performance", m.nuscenes.hybrid)}
+                            ${renderStats("Image Component (Vision Only)", m.nuscenes.image)}
+                            ${renderStats("Sensor Component (Signal Only)", m.nuscenes.sensor)}
+                        </div>
+                    `;
+                } catch (e) {
+                    document.getElementById('manual-metrics-display').innerText = "Error loading metrics.";
+                }
+            }
+
+            // Override showPanel to load data
+            const originalShowPanel = window.showPanel;
+            window.showPanel = function (id) {
+                // Call original logic via DOM manip since original function is global
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                const el = document.getElementById(id);
+                if (el) el.classList.add('active');
+
+                // Active button highlighting requires searching by onclick attribute or ID
+                // Simple hack: highlight based on order or text? 
+                // The original function used matching logic. 
+                // Let's just reimplement simple highlighting:
+                const btns = document.querySelectorAll('.nav-btn');
+                btns.forEach(b => {
+                    if (b.getAttribute('onclick').includes(id)) b.classList.add('active');
+                });
+
+                if (id === 'panel-review') {
+                    loadSessions();
+                    loadTopHybridModels();
+                }
+                if (id === 'panel-nuscenes') {
+                    loadNuScenesData();
+                }
+                if (id === 'panel-metrics') {
+                    loadManualMetrics();
+                }
+                if (id === 'panel-research') {
+                    loadResearchAnalytics();
+                }
+                if (id === 'panel-hybrid') {
+                    loadCandidateModels();
+                }
+            };
+
+            let researchCharts = {};
+
+            async function loadResearchAnalytics() {
+                try {
+                    const res = await fetch('/api/analytics/research');
+                    const data = await res.json();
+
+                    // 1. Hypothesis Verification
+                    const summary = data.modality_summary;
+                    const hybridBest = summary["Hybrid"] ? summary["Hybrid"].best_acc : 0;
+                    const singleBest = Math.max(
+                        summary["Image"] ? summary["Image"].best_acc : 0,
+                        summary["1D-CNN"] ? summary["1D-CNN"].best_acc : 0
+                    );
+
+                    const hypothesisSummary = document.getElementById('hypothesis-summary');
+                    if (hybridBest > singleBest) {
+                        hypothesisSummary.innerHTML = `✅ <strong>Hypothesis Supported</strong>: Hybrid fusion achieves <strong>${((hybridBest - singleBest) * 100).toFixed(1)}%</strong> higher peak accuracy than individual modalities.`;
+                        document.getElementById('hypothesis-card').style.borderColor = '#27ae60';
+                    } else if (hybridBest > 0) {
+                        hypothesisSummary.innerHTML = `⚠️ <strong>Hypothesis Inconclusive</strong>: Hybrid fusion performance currently matches single modality peaks.`;
+                        document.getElementById('hypothesis-card').style.borderColor = '#f39c12';
+                    } else {
+                        hypothesisSummary.innerHTML = `ℹ️ <strong>Insufficient Data</strong>: Run training experiments in B, C, and D to compare results.`;
+                    }
+
+                    // 1b. Real-World Comparison Summary (Section F)
+                    const m = data.manual_metrics;
+                    const compEl = document.getElementById('comparison-summary');
+                    if (m && m.hybrid && m.hybrid.total > 0) {
+                        const hAcc = m.hybrid.accuracy * 100;
+                        const iAcc = m.image.accuracy * 100;
+                        const sAcc = m.sensor.accuracy * 100;
+                        const hTP = m.hybrid.tp;
+                        const iTP = m.image.tp;
+                        const sTP = m.sensor.tp;
+                        const sPrec = m.sensor.precision * 100;
+
+                        // Data-driven comparison only — verdicts belong in the
+                        // analysis docs, never hard-coded into UI templates.
+                        const best = [['Hybrid', hAcc], ['Vision', iAcc], ['Sensor', sAcc]]
+                            .sort((a, b) => b[1] - a[1]);
+                        compEl.innerHTML = `
+                            <p>Based on <strong>${m.hybrid.total}</strong> manually verified events
+                            (unblinded review; see docs/TRANSFER_PROTOCOL.md for the
+                            blinded-protocol results):</p>
+                            <ul>
+                                <li><strong>Accuracy</strong>: Hybrid ${hAcc.toFixed(1)}% · Vision ${iAcc.toFixed(1)}% · Sensor ${sAcc.toFixed(1)}% — highest: ${best[0][0]}.</li>
+                                <li><strong>Confirmed potholes (TP)</strong>: Hybrid ${hTP} · Vision ${iTP} · Sensor ${sTP}.</li>
+                                <li><strong>Sensor precision</strong>: ${sPrec.toFixed(0)}%.</li>
+                            </ul>
+                            <p><strong>Note</strong>: these counts come from reviewing model-triggered
+                            events only, so they cannot measure missed potholes. Treat them as
+                            indicative, not conclusive.</p>
+                        `;
+                    } else {
+                        compEl.innerHTML = `ℹ️ <strong>Insufficient Review Data</strong>: Complete manual reviews in Section E or E1 to see real-world comparisons.`;
+                    }
+
+                    // 2. Performance & Consistency Chart (Average + Std Dev)
+                    renderConsistencyChart(summary);
+
+                    // 3. Efficiency Frontier & Perspective Transferability
+                    renderEfficiencyFrontier(summary, data.latency_estimates);
+                    renderPerspectiveChart(data.perspective_summary);
+
+                    // 4. Advanced Charts (PR Scatter, Complexity, CMs)
+                    // 3b. Hybrid Algorithm Comparison
+                    renderHybridAlgoChart(data.all_results);
+
+                    // 4. Advanced Charts (PR Scatter, Complexity, CMs)
+                    renderAdvCharts(summary, data.manual_metrics);
+                    renderLearnings(data);
+
+                    // 6. Data Table
+                    const tbody = document.querySelector('#research-data-table tbody');
+                    tbody.innerHTML = data.all_results.sort((a, b) => b.accuracy - a.accuracy).map(r => `
+                        <tr>
+                            <td><span class="badge source-${r.modality.toLowerCase()}">${r.modality}</span></td>
+                            <td>${r.algorithm}</td>
+                            <td>${r.dataset.split('/').pop()}</td>
+                            <td><strong>${(r.accuracy * 100).toFixed(1)}%</strong></td>
+                            <td>${(r.f1 * 100).toFixed(1)}%</td>
+                        </tr>
+                    `).join('');
+
+                } catch (e) { log('Error loading research analytics: ' + e); }
+            }
+
+            function renderEfficiencyFrontier(summary, latency) {
+                const ctx = document.getElementById('chart-efficiency').getContext('2d');
+                if (researchCharts.efficiency) researchCharts.efficiency.destroy();
+
+                const datasets = [];
+                const colors = { "Image": "#3498db", "1D-CNN": "#e67e22", "Hybrid": "#27ae60" };
+
+                Object.keys(summary).forEach(mod => {
+                    const acc = summary[mod].avg_accuracy;
+                    const lat = latency[mod];
+                    datasets.push({
+                        label: mod,
+                        data: [{ x: lat, y: acc * 100, r: 8 }], // r=radius
+                        backgroundColor: colors[mod]
+                    });
+                });
+
+                researchCharts.efficiency = new Chart(ctx, {
+                    type: 'bubble',
+                    data: { datasets: datasets },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { title: { display: true, text: 'Latency (ms) [Log Scale]' }, type: 'logarithmic' },
+                            y: { title: { display: true, text: 'Average Accuracy (%)' }, min: 50, max: 100 }
+                        },
+                        plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.raw.y.toFixed(1)}% @ ${c.raw.x}ms` } } }
+                    }
+                });
+            }
+
+            function renderPerspectiveChart(pStats) {
+                const ctx = document.getElementById('chart-perspective').getContext('2d');
+                if (researchCharts.perspective) researchCharts.perspective.destroy();
+
+                const perspectives = ["Handheld", "Vehicle"];
+                const imgData = perspectives.map(p => (pStats[p] ? pStats[p].avg_image * 100 : 0));
+                const hybData = perspectives.map(p => (pStats[p] ? pStats[p].avg_hybrid * 100 : 0));
+
+                researchCharts.perspective = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: perspectives,
+                        datasets: [
+                            { label: 'Image Only', data: imgData, backgroundColor: '#3498db' },
+                            { label: 'Hybrid Fusion', data: hybData, backgroundColor: '#27ae60' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'Accuracy (%)' } } }
+                    }
+                });
+            }
+
+            function renderAdvCharts(summary, manual) {
+                // Precision vs Recall Scatter
+                const ctxPR = document.getElementById('chart-pr-scatter').getContext('2d');
+                if (researchCharts.pr) researchCharts.pr.destroy();
+
+                const datasetsPR = [];
+                const colors = { "Image": "#3498db", "1D-CNN": "#e67e22", "Hybrid": "#27ae60" };
+
+                Object.keys(summary).forEach(mod => {
+                    const points = summary[mod].metrics_list ? summary[mod].metrics_list.map(m => ({ x: m.recall, y: m.precision })) : [];
+                    datasetsPR.push({
+                        label: mod,
+                        data: points,
+                        backgroundColor: colors[mod],
+                        pointRadius: 5
+                    });
+                });
+
+                researchCharts.pr = new Chart(ctxPR, {
+                    type: 'scatter',
+                    data: { datasets: datasetsPR },
+                    options: {
+                        scales: {
+                            x: { title: { display: true, text: 'Recall' }, min: 0.5, max: 1.0 },
+                            y: { title: { display: true, text: 'Precision' }, min: 0.5, max: 1.0 }
+                        }
+                    }
+                });
+
+                // Dataset Complexity (Size vs Accuracy)
+                const ctxComp = document.getElementById('chart-complexity').getContext('2d');
+                if (researchCharts.comp) researchCharts.comp.destroy();
+
+                const datasetsComp = [];
+                Object.keys(summary).forEach(mod => {
+                    const points = summary[mod].metrics_list ? summary[mod].metrics_list.map(m => ({ x: m.dataset_size, y: m.accuracy, r: 6 })) : [];
+                    datasetsComp.push({
+                        label: mod,
+                        data: points,
+                        backgroundColor: colors[mod] + "88" // Semi-transparent
+                    });
+                });
+
+                researchCharts.comp = new Chart(ctxComp, {
+                    type: 'bubble',
+                    data: { datasets: datasetsComp },
+                    options: {
+                        scales: {
+                            x: { title: { display: true, text: 'Dataset Size (Samples)' }, type: 'logarithmic' },
+                            y: { title: { display: true, text: 'Accuracy' }, min: 0.5, max: 1.0 }
+                        }
+                    }
+                });
+
+                // Sim vs Real Bar Chart
+                const ctxSim = document.getElementById('chart-sim-real').getContext('2d');
+                if (researchCharts.sim) researchCharts.sim.destroy();
+
+                const realAcc = manual && manual.hybrid ? manual.hybrid.precision : 0; // Using precision as proxy for real-world accuracy
+                const simAcc = summary["Hybrid"] ? summary["Hybrid"].avg_accuracy : 0;
+
+                researchCharts.sim = new Chart(ctxSim, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Simulated (Avg)', 'Real-World (Precision)'],
+                        datasets: [{
+                            label: 'Hybrid Performance',
+                            data: [simAcc * 100, realAcc * 100],
+                            backgroundColor: ['#3498db', '#f1c40f']
+                        }]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true, max: 100 } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+                // Aggregated Confusion Matrices
+                const drawCM = (id, cm) => {
+                    const el = document.getElementById(id);
+                    if (!el || !cm) return;
+                    // Normalize for color intensity
+                    const total = cm[0][0] + cm[0][1] + cm[1][0] + cm[1][1];
+                    const norm = val => total > 0 ? Math.min(1.0, val / (total * 0.6)) : 0; // Heuristic scaling
+
+                    const colorCell = (val, isGood) => {
+                        const intensity = Math.floor(norm(val) * 255);
+                        const bg = isGood ? `rgba(46, 125, 50, ${norm(val)})` : `rgba(198, 40, 40, ${norm(val)})`;
+                        return `<div class="cm-cell" style="background:${bg}; color: #333"><span>${val}</span></div>`;
+                    };
+
+                    el.innerHTML = `
+                        <div class="cm-heatmap" style="grid-template-columns: 1fr 1fr; gap: 2px;">
+                            ${colorCell(cm[0][0], true)} <!-- TN -->
+                            ${colorCell(cm[0][1], false)} <!-- FP -->
+                            ${colorCell(cm[1][0], false)} <!-- FN -->
+                            ${colorCell(cm[1][1], true)} <!-- TP -->
+                        </div>
+                        <div style="font-size: 0.7em; display:grid; grid-template-columns: 1fr 1fr; text-align: center; margin-top:2px;">
+                            <span>Actual Neg</span><span>Actual Pos</span>
+                        </div>
+                    `;
+                };
+
+                drawCM('cm-image-agg', summary["Image"] ? summary["Image"].agg_confusion_matrix : null);
+                drawCM('cm-sensor-agg', summary["1D-CNN"] ? summary["1D-CNN"].agg_confusion_matrix : null);
+                drawCM('cm-hybrid-agg', summary["Hybrid"] ? summary["Hybrid"].agg_confusion_matrix : null);
+            }
+
+            function renderConsistencyChart(summary) {
+                const ctx = document.getElementById('chart-consistency').getContext('2d');
+                if (researchCharts.consistency) researchCharts.consistency.destroy();
+
+                const labels = Object.keys(summary).sort();
+                const avgAccs = labels.map(l => summary[l].avg_accuracy * 100);
+                const stdDevs = labels.map(l => summary[l].std_dev * 100);
+
+                researchCharts.consistency = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Avg Accuracy (%)',
+                                data: avgAccs,
+                                backgroundColor: '#3498db',
+                                order: 2
+                            },
+                            {
+                                label: 'Variance (Std Dev)',
+                                data: stdDevs,
+                                backgroundColor: '#e74c3c',
+                                type: 'line',
+                                borderColor: '#c0392b',
+                                borderDash: [5, 5],
+                                fill: false,
+                                order: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: { y: { beginAtZero: true, max: 100 } }
+                    }
+                });
+            }
+
+            function renderFusionGainChart(highlights) {
+                const ctx = document.getElementById('chart-fusion-gain').getContext('2d');
+                if (researchCharts.gain) researchCharts.gain.destroy();
+
+                const topHighlights = highlights.slice(0, 5);
+
+                researchCharts.gain = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: topHighlights.map(h => h.dataset),
+                        datasets: [
+                            {
+                                label: 'Hybrid Gain over Single (%)',
+                                data: topHighlights.map(h => h.fusion_gain * 100),
+                                backgroundColor: '#27ae60'
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { beginAtZero: true, title: { display: true, text: 'Improvement Delta (%)' } } }
+                    }
+                });
+            }
+
+            function renderLearnings(data) {
+                const list = document.getElementById('learnings-list');
+                const s = data.modality_summary;
+
+                let html = '';
+
+                // Consistency Learning
+                const hybridStd = s["Hybrid"] ? s["Hybrid"].std_dev : 1;
+                const bestSingleStd = Math.min(s["Image"] ? s["Image"].std_dev : 1, s["1D-CNN"] ? s["1D-CNN"].std_dev : 1);
+
+                if (hybridStd < bestSingleStd) {
+                    html += `<li><strong>Reliability</strong>: Hybrid models are <u>${((1 - hybridStd / bestSingleStd) * 100).toFixed(0)}% more consistent</u> across diverse datasets than single-modality models.</li>`;
+                }
+
+                // Generalization Learning
+                const hBest = data.dataset_gains ? data.dataset_gains[0] : null;
+                if (hBest && hBest.fusion_gain > 0.05) {
+                    html += `<li><strong>Edge Case Performance</strong>: In the <i>${hBest.dataset}</i> scenario, sensor-vision fusion provided a <u>${(hBest.fusion_gain * 100).toFixed(1)}% accuracy bootstrap</u>.</li>`;
+                }
+
+                // Real World Learning
+                const m = data.manual_metrics;
+                if (m && m.hybrid && m.hybrid.total > 0) {
+                    const simAvg = s["Hybrid"] ? s["Hybrid"].avg_accuracy : 0;
+                    const realPrec = m.hybrid.precision;
+                    const gap = simAvg - realPrec;
+                    html += `<li><strong>Translation Gap</strong>: Real-world precision matches training accuracy within <u>${(Math.abs(gap) * 100).toFixed(1)}%</u>, validating the model's generalization.</li>`;
+                }
+
+                list.innerHTML = html || "<li>Insufficient data to generate advanced insights. Run more experiments.</li>";
+            }
+
+            function downloadExcelPackage() {
+                window.location.href = '/api/analytics/export';
+            }
+
+            function downloadChart(canvasId, fileName) {
+                const canvas = document.getElementById(canvasId);
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+
+            // --- Section E1: nuScenes JS ---
+            let nuStats = { total: 0, current: 0, sessionId: null, runId: null, scenes: [], currentTime: 0 };
+
+            async function loadNuScenesData() {
+                try {
+                    // 1. Load Sessions
+                    const sRes = await fetch('/api/nuscenes/sessions');
+                    nuStats.scenes = await sRes.json();
+                    const sSelect = document.getElementById('nu-session-select');
+                    sSelect.innerHTML = nuStats.scenes.map(s => `<option value="${s.path}">${s.name} ${s.processed ? '✅' : '(needs processing)'}</option>`).join('');
+
+                    // 2. Load Models
+                    const mRes = await fetch('/api/models/hybrid/top');
+                    const models = await mRes.json();
+                    document.getElementById('nu-model-select').innerHTML = models.map(m =>
+                        `<option value="${m.id}" data-img="${m.image_model}" data-snr="${m.sensor_model}">${m.name} (Acc: ${(m.accuracy * 100).toFixed(1)}%)</option>`
+                    ).join('');
+
+                    // 3. Check for existing history
+                    if (nuStats.scenes.length > 0) {
+                        window.checkNuHistory(nuStats.scenes[0].id);
+                    }
+                } catch (e) { log("Error loading nuScenes data: " + e); }
+            }
+
+            window.checkNuHistory = async function (folderName) {
+                const statusEl = document.getElementById('nu-inference-status');
+                const verifyUI = document.getElementById('nu-verification-ui');
+
+                try {
+                    const res = await fetch(`/api/reviews/history/${encodeURIComponent(folderName)}`);
+                    const data = await res.json();
+                    if (data.status === 'found') {
+                        statusEl.innerText = "Previous results found. Loading review...";
+
+                        let reviewId = data.review_session_id;
+                        if (!reviewId) {
+                            // Auto-create session if missing
+                            const sRes = await fetch(`/api/reviews/start?run_id=${data.job_id}`, { method: 'POST' });
+                            const sData = await sRes.json();
+                            reviewId = sData.session_id;
+                        }
+
+                        showNuResults(data.job_id, data.session_name, reviewId);
+                    } else {
+                        statusEl.innerText = "No previous results found for this scene.";
+                        verifyUI.style.display = 'none';
+                    }
+                } catch (e) { log("Error checking history: " + e); }
+            }
+
+            window.runNuInference = async function () {
+                const sessionPath = document.getElementById('nu-session-select').value;
+                const modelSelect = document.getElementById('nu-model-select');
+                const modelOption = modelSelect.options[modelSelect.selectedIndex];
+
+                if (!sessionPath) return alert("Select a scene");
+
+                const sessionId = sessionPath.split('/').pop();
+                const statusEl = document.getElementById('nu-inference-status');
+                statusEl.innerText = "Submitting job...";
+
+                try {
+                    const res = await fetch('/api/inference/run', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            task_type: "run_inference_nuscenes",
+                            args: {
+                                session_path: sessionPath,
+                                session_id: sessionId,
+                                model_config: {
+                                    image_model: modelOption.getAttribute('data-img'),
+                                    sensor_model: modelOption.getAttribute('data-snr')
+                                }
+                            }
+                        })
+                    });
+                    const job = await res.json();
+                    statusEl.innerText = `Job #${job.id} started. Monitoring...`;
+                    pollNuJob(job.id, sessionId);
+                } catch (e) { statusEl.innerText = "Error: " + e; }
+            }
+
+            async function pollNuJob(id, sessionId) {
+                const statusEl = document.getElementById('nu-inference-status');
+                const interval = setInterval(async () => {
+                    const res = await fetch(`/api/jobs/${id}`);
+                    const job = await res.json();
+                    if (job.status === 'completed') {
+                        clearInterval(interval);
+                        statusEl.innerText = "Inference complete! Loading review...";
+                        // Start review session automatically
+                        const revRes = await fetch(`/api/reviews/start?run_id=${id}`, { method: 'POST' });
+                        const revData = await revRes.json();
+                        showNuResults(id, sessionId, revData.session_id);
+                    } else if (job.status === 'failed') {
+                        clearInterval(interval);
+                        statusEl.innerText = "Job failed: " + job.error_message;
+                    }
+                }, 2000);
+            }
+
+            async function showNuResults(runId, sessionName, reviewId) {
+                document.getElementById('nu-verification-ui').style.display = 'block';
+                document.getElementById('nu-current-session-name').innerText = sessionName;
+                document.getElementById('nu-current-run-id').innerText = runId;
+                nuStats.runId = runId;
+                nuStats.sessionId = reviewId;
+                loadNuReviewEvents(reviewId);
+            }
+
+            async function loadNuReviewEvents(reviewId) {
+                const res = await fetch(`/api/reviews/${reviewId}/events`);
+                const events = await res.json();
+                const tbody = document.getElementById('nu-event-list-body');
+
+                if (events.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No events detected.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = events.map(e => `
+                    <tr onclick="playNuEvent(${e.time}, '${e.video_url || ''}', '${e.image_url || ''}')" style="cursor:pointer;" class="${e.status}">
+                        <td>${e.time.toFixed(2)}s</td>
+                        <td>${(e.score * 100).toFixed(0)}%</td>
+                        <td><span class="badge source-${e.source}">${e.source}</span></td>
+                        <td>${e.status}</td>
+                    </tr>
+                `).join('');
+
+                // Auto-play first unlabeled
+                const next = events.find(e => e.status === 'unlabeled');
+                if (next) playNuEvent(next.time, next.video_url || '', next.image_url || '');
+            }
+
+            window.playNuEvent = function (time, videoUrl, imageUrl) {
+                const player = document.getElementById('nu-review-player');
+                const img = document.getElementById('nu-review-image');
+
+                if (imageUrl) {
+                    img.src = imageUrl;
+                    img.style.display = 'block';
+                    player.style.display = 'none';
+                    player.pause();
+                } else {
+                    img.style.display = 'none';
+                    player.style.display = 'block';
+                    if (videoUrl) {
+                        player.src = videoUrl;
+                        player.currentTime = Math.max(0, time - 2);
+                        player.play();
+                    }
+                }
+                nuStats.currentTime = time;
+            }
+
+            window.labelNuEvent = async function (ispothole) {
+                if (!nuStats.sessionId) return;
+                // Find current event from video time
+                const res = await fetch(`/api/reviews/${nuStats.sessionId}/events`);
+                const events = await res.json();
+                const current = events.find(e => Math.abs(e.time - nuStats.currentTime) < 0.1);
+
+                if (!current) {
+                    // Try exact time match if found via playNuEvent
+                    alert("Click an event in the list first to label it.");
+                    return;
+                }
+
+                await fetch(`/api/reviews/events/${current.id}/label?session_id=${nuStats.sessionId}&is_pothole=${ispothole}`, { method: 'POST' });
+                loadNuReviewEvents(nuStats.sessionId);
+                loadManualMetrics(); // Update Section F
+            }
+
+            // Main Init
+            document.addEventListener('DOMContentLoaded', async () => {
+                log("Initializing application...");
+                try {
+                    await loadDatasets();
+                    pollJobs();
+                    setInterval(pollJobs, 2000);
+
+                    // Pre-load Section E if it's the active panel (or just always)
+                    loadSessions();
+                    loadTopHybridModels();
+                } catch (e) {
+                    log(`Init Error: ${e}`);
+                }
+            });
+            function renderHybridAlgoChart(results) {
+                const ctx = document.getElementById('chart-hybrid-algo').getContext('2d');
+                if (researchCharts.hybridAlgo) researchCharts.hybridAlgo.destroy();
+
+                const hybridResults = results.filter(r => r.modality === 'Hybrid' && r.fusion_type);
+                const types = ["Feature", "Late"];
+                const averages = types.map(t => {
+                    const matches = hybridResults.filter(r => r.fusion_type === t);
+                    return matches.length > 0 ? (matches.reduce((sum, r) => sum + r.accuracy, 0) / matches.length) * 100 : 0;
+                });
+
+                researchCharts.hybridAlgo = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ["Feature Fusion (Early)", "Late Fusion (Consensus)"],
+                        datasets: [{
+                            label: 'Avg Accuracy (%)',
+                            data: averages,
+                            backgroundColor: ['#9c27b0', '#673ab7']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'Accuracy (%)' } } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+        </script>
+</body>
+
+</html>

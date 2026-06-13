@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blinded Pothole Review</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: -apple-system, system-ui, sans-serif; background:#111;
+         color:#eee; margin:0; display:flex; flex-direction:column;
+         align-items:center; min-height:100vh; }
+  header { width:100%; max-width:880px; padding:14px 16px; display:flex;
+           justify-content:space-between; align-items:center; box-sizing:border-box; }
+  h1 { font-size:18px; margin:0; font-weight:600; }
+  #progress { font-variant-numeric:tabular-nums; color:#9ad; }
+  #bar { width:100%; max-width:880px; height:6px; background:#222;
+         border-radius:3px; overflow:hidden; margin-bottom:14px; }
+  #bar div { height:100%; background:#4a90d9; width:0%; transition:width .2s; }
+  main { width:100%; max-width:880px; padding:0 16px; box-sizing:border-box; }
+  video { width:100%; max-height:520px; background:#000; border-radius:8px; }
+  img#still { width:100%; border-radius:8px; display:none; }
+  .protocol { font-size:13px; color:#999; margin:10px 0 16px;
+              line-height:1.5; }
+  .buttons { display:flex; gap:12px; margin:14px 0 30px; }
+  button { flex:1; padding:16px 0; font-size:16px; font-weight:600;
+           border:none; border-radius:8px; cursor:pointer; color:#fff; }
+  #b-pothole   { background:#2e7d32; }
+  #b-not       { background:#b3422e; }
+  #b-unsure    { background:#555; }
+  button:hover { filter:brightness(1.15); }
+  kbd { background:#333; border-radius:4px; padding:1px 6px; font-size:12px; }
+  #done { display:none; text-align:center; margin-top:60px; }
+  #replay { background:#333; flex:0 0 110px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Blinded review</h1>
+  <span id="progress">–</span>
+</header>
+<div id="bar"><div id="barfill"></div></div>
+<main>
+  <div class="protocol">
+    Label what the <b>vehicle encounters in this clip</b>.
+    <b>Pothole</b> = a bowl-shaped hole in the pavement surface (any size).
+    <b>Not pothole</b> = everything else: cracks, patches, manholes,
+    expansion joints, speed bumps, debris, smooth road, shadows.
+    <b>Unsure</b> = cannot tell from the clip. Shortcuts:
+    <kbd>1</kbd> pothole · <kbd>2</kbd> not pothole · <kbd>3</kbd> unsure ·
+    <kbd>R</kbd> replay.
+  </div>
+  <video id="clip" autoplay muted playsinline loop></video>
+  <img id="still" alt="">
+  <div class="buttons">
+    <button id="b-pothole">Pothole (1)</button>
+    <button id="b-not">Not pothole (2)</button>
+    <button id="b-unsure">Unsure (3)</button>
+    <button id="replay">Replay (R)</button>
+  </div>
+  <div id="done">
+    <h2>All items labeled — thank you.</h2>
+    <p>Metrics will be computed from the saved labels
+       (<code>/api/transfer/metrics</code>).</p>
+  </div>
+</main>
+<script>
+let queue = [], idx = 0;
+const reviewer = localStorage.getItem("reviewer") ||
+  (() => { const r = prompt("Reviewer name/initials:", "user") || "user";
+           localStorage.setItem("reviewer", r); return r; })();
+
+async function loadQueue() {
+  const res = await fetch(`/api/transfer/queue?reviewer=${encodeURIComponent(reviewer)}`);
+  const data = await res.json();
+  queue = data.items.filter(i => !i.labeled);
+  updateProgress(data.total, data.labeled);
+  show();
+}
+function updateProgress(total, labeled) {
+  document.getElementById("progress").textContent =
+    `${labeled} / ${total} labeled — reviewer: ${reviewer}`;
+  document.getElementById("barfill").style.width =
+    total ? (100 * labeled / total) + "%" : "0%";
+}
+function show() {
+  const v = document.getElementById("clip"),
+        im = document.getElementById("still");
+  if (idx >= queue.length) {
+    v.style.display = "none"; im.style.display = "none";
+    document.querySelector(".buttons").style.display = "none";
+    document.getElementById("done").style.display = "block";
+    return;
+  }
+  const it = queue[idx];
+  if (it.clip_url) {
+    v.style.display = ""; im.style.display = "none";
+    v.src = it.clip_url; v.load(); v.play().catch(()=>{});
+  } else {
+    v.style.display = "none"; im.style.display = "block";
+    im.src = it.image_url;
+  }
+}
+async function label(value) {
+  if (idx >= queue.length) return;
+  const it = queue[idx];
+  await fetch("/api/transfer/label", {
+    method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({item_id: it.id, label: value, reviewer})
+  });
+  idx += 1;
+  const total = parseInt(document.getElementById("progress").textContent) || 0;
+  // refresh progress from server every 10 labels, else local increment
+  if (idx % 10 === 0) loadQueue().then(() => { idx = 0; });
+  else {
+    const m = document.getElementById("progress").textContent
+                .match(/(\d+) \/ (\d+)/);
+    if (m) updateProgress(parseInt(m[2]), parseInt(m[1]) + 1);
+    show();
+  }
+}
+document.getElementById("b-pothole").onclick = () => label("pothole");
+document.getElementById("b-not").onclick = () => label("not_pothole");
+document.getElementById("b-unsure").onclick = () => label("unsure");
+document.getElementById("replay").onclick =
+  () => { const v = document.getElementById("clip"); v.currentTime = 0; v.play(); };
+document.addEventListener("keydown", e => {
+  if (e.key === "1") label("pothole");
+  else if (e.key === "2") label("not_pothole");
+  else if (e.key === "3") label("unsure");
+  else if (e.key.toLowerCase() === "r") document.getElementById("replay").click();
+});
+loadQueue();
+</script>
+</body>
+</html>
