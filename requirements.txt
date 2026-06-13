@@ -1,0 +1,17 @@
+fastapi>=0.115,<1.0
+uvicorn>=0.32,<1.0
+sqlmodel>=0.0.22,<1.0
+pydantic>=2.9,<3.0
+pandas>=2.2,<3.0
+numpy>=1.26,<2.0
+scikit-learn>=1.5,<2.0
+torch>=2.4,<3.0
+torchvision>=0.19,<1.0
+ultralytics>=8.3,<9.0
+segmentation-models-pytorch>=0.3.4,<1.0
+opencv-python-headless>=4.10,<5.0
+ffmpeg-python>=0.2,<1.0
+python-multipart>=0.0.12,<1.0
+requests>=2.32,<3.0
+scipy>=1.14,<2.0
+joblib>=1.4,<2.0
