@@ -1,0 +1,25 @@
+{
+ "drive_id": "drive_04",
+ "phone_model": "iPhone 17 Pro Max",
+ "sample_rate_hz": 100,
+ "n_samples": 7012,
+ "duration_s": 70.1,
+ "columns": [
+  "seconds_elapsed",
+  "accel_x",
+  "accel_y",
+  "accel_z",
+  "gyro_x",
+  "gyro_y",
+  "gyro_z"
+ ],
+ "removed_for_privacy": [
+  "latitude",
+  "longitude",
+  "speed",
+  "absolute_timestamp",
+  "device_id",
+  "timezone",
+  "recording_datetime"
+ ]
+}
