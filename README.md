@@ -91,9 +91,19 @@ python tools/run_transfer.py     # detect potholes with the frozen models
 Fair warning: these models are a **baseline to beat**, not a finished
 product — see the real-world results below.
 
-## Get the data
+## My own dataset
 
-The full datasets are too big for GitHub. Run the setup assistant — it
+I'm releasing my real iPhone drives as a dataset others can use — the
+accelerometer/gyroscope streams plus 232 human-labeled video clips. See
+[dataset/README.md](dataset/README.md). The sensor data is privacy-scrubbed
+(GPS, timestamps, device IDs, and street names all removed); the video clips
+are auto-blurred for faces, plates, and signs (imperfect — see the dataset's
+privacy note and terms). The scrub is reproducible:
+`tools/build_release_dataset.py` + `tools/blur_clips.py`.
+
+## Get the data (for training/benchmarks)
+
+The full training datasets are too big for GitHub. Run the setup assistant — it
 checks what you have, downloads what it can, and gives exact
 instructions for the rest:
 
@@ -168,6 +178,7 @@ Two things I want to build on top of this:
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Advanced | How the code is organized and why |
 | [docs/DATASETS.md](docs/DATASETS.md) | Advanced | Every dataset, every label rule |
 | [docs/TRANSFER_PROTOCOL.md](docs/TRANSFER_PROTOCOL.md) | Advanced | The pre-registered real-world experiment plan |
+| [dataset/README.md](dataset/README.md) | Easy | My iPhone drives, privacy-scrubbed (sensor + labeled clips) |
 | [models/pretrained/](models/pretrained/) | Easy | Ready-to-run trained models (~13 MB) |
 | [results/benchmarks/SUMMARY.md](results/benchmarks/SUMMARY.md) | Medium | The 94-test benchmark tables |
 | [results/transfer/FINDINGS.md](results/transfer/FINDINGS.md) | Medium | The real-world transfer analysis (starts with a plain-English summary) |

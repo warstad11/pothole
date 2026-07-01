@@ -1,0 +1,6 @@
+# Privacy: never commit the private id->address map or clip manifest
+../release_*.DO_NOT_PUBLISH.json
+release_*.DO_NOT_PUBLISH.json
+# OS cruft
+.DS_Store
+**/.DS_Store
