@@ -4,6 +4,8 @@
 
 By **Warren Stading** ([@warstad11](https://github.com/warstad11)) · Austin, Texas · Accepted to GARSEF (Austin regional science fair), 2026
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22071639.svg)](https://doi.org/10.5281/zenodo.22071639)
+
 **Can a car detect potholes better with a camera, a motion sensor, or both
 at once?** I built this project to find out.
 
@@ -212,8 +214,8 @@ fair), 2026**.
 If you use this code, the models, the dataset, or the findings, please cite:
 
 > Stading, Warren (2026). *Pothole Detection Lab: camera, sensor, and hybrid
-> pothole detection with a real-world transfer study.*
-> https://github.com/warstad11/pothole
+> pothole detection with a real-world transfer study.* Zenodo.
+> https://doi.org/10.5281/zenodo.22071639
 
 BibTeX:
 
@@ -223,7 +225,9 @@ BibTeX:
   title   = {Pothole Detection Lab: camera, sensor, and hybrid pothole
              detection with a real-world transfer study},
   year    = {2026},
-  url     = {https://github.com/warstad11/pothole}
+  publisher = {Zenodo},
+  doi     = {10.5281/zenodo.22071639},
+  url     = {https://doi.org/10.5281/zenodo.22071639}
 }
 ```
 

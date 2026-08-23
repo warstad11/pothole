@@ -11,11 +11,14 @@ url: "https://github.com/warstad11/pothole"
 version: "1.0.0"
 date-released: 2026-06-21
 license: MIT
-# After connecting the repo to Zenodo and cutting a release, add the DOI here:
-# identifiers:
-#   - type: doi
-#     value: "10.5281/zenodo.XXXXXXX"
-#     description: "Archived release (all versions)"
+doi: "10.5281/zenodo.22071639"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.22071639"
+    description: "Concept DOI — always resolves to the latest version"
+  - type: doi
+    value: "10.5281/zenodo.22071640"
+    description: "Archived v1.0.0 release"
 abstract: >
   A research platform for pothole detection that trains and fairly
   benchmarks image models (YOLOv8, Faster R-CNN, U-Net, ResNet18),
