@@ -5,8 +5,7 @@ type: software
 authors:
   - family-names: "Stading"
     given-names: "Warren"
-    # After creating a free ORCID iD at https://orcid.org, uncomment and fill:
-    # orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0009-0008-4492-6100"
 repository-code: "https://github.com/warstad11/pothole"
 url: "https://github.com/warstad11/pothole"
 version: "1.0.0"

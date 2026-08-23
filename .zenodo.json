@@ -1,0 +1,26 @@
+{
+  "upload_type": "software",
+  "title": "Pothole Detection Lab: camera, sensor, and hybrid pothole detection with a real-world transfer study",
+  "creators": [
+    {
+      "name": "Stading, Warren",
+      "orcid": "0009-0008-4492-6100"
+    }
+  ],
+  "description": "<p>A research platform for pothole detection that trains and fairly benchmarks image models (YOLOv8, Faster R-CNN, U-Net, ResNet18), motion-sensor models (Random Forest, 1D-CNN, BiLSTM), and hybrid fusion models, under a strict pothole-versus-other-road-anomaly task definition.</p><p>Includes a 94-experiment benchmark campaign and a pre-registered, blinded real-world transfer study on iPhone and nuScenes drives. Key finding: the in-distribution hybrid fusion advantage (F1 0.622 vs 0.605) does <em>not</em> survive platform transfer &mdash; on real drives precision fell to approximately 0.10 for all pipelines and the fusion advantage disappeared, because the image branch collapsed on dashcam video. The result was replicated across two independent blinded labeling rounds.</p><p>Ships pre-trained models and a privacy-scrubbed dataset of real driving sensor data with 232 human-labeled event clips.</p>",
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "pothole detection",
+    "sensor fusion",
+    "multimodal machine learning",
+    "domain transfer",
+    "distribution shift",
+    "autonomous vehicles",
+    "computer vision",
+    "accelerometer",
+    "road maintenance",
+    "open dataset",
+    "reproducible research"
+  ]
+}
