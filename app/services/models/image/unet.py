@@ -410,7 +410,7 @@ class UNetWrapper(BaseModel):
     def predict_embedding(self, img: np.ndarray) -> np.ndarray:
         """
         Extracts 512-dim feature vector for a single image (H, W, 3).
-        Matches logic in tools/evaluate_fusion_unet_rf_full.py
+        Used by the hybrid feature-fusion pipeline.
         """
         self.model.eval()
         

@@ -1,5 +1,9 @@
 # Pothole Detection Lab 🚗
 
+**Multi-modal pothole detection — camera, motion sensor, and hybrid fusion — with a pre-registered, blinded real-world transfer study.**
+
+By **Warren Stading** ([@warstad11](https://github.com/warstad11)) · Austin, Texas · Accepted to GARSEF (Austin regional science fair), 2026
+
 **Can a car detect potholes better with a camera, a motion sensor, or both
 at once?** I built this project to find out.
 
@@ -203,6 +207,32 @@ fair), 2026**.
 - **Open-source tools**: PyTorch, Ultralytics YOLOv8, scikit-learn,
   FastAPI, and ffmpeg.
 
+## How to cite this work
+
+If you use this code, the models, the dataset, or the findings, please cite:
+
+> Stading, Warren (2026). *Pothole Detection Lab: camera, sensor, and hybrid
+> pothole detection with a real-world transfer study.*
+> https://github.com/warstad11/pothole
+
+BibTeX:
+
+```bibtex
+@software{stading2026pothole,
+  author  = {Stading, Warren},
+  title   = {Pothole Detection Lab: camera, sensor, and hybrid pothole
+             detection with a real-world transfer study},
+  year    = {2026},
+  url     = {https://github.com/warstad11/pothole}
+}
+```
+
 ## License
 
 MIT — use it, learn from it, build on it. See [LICENSE](LICENSE).
+
+**Datasets are licensed separately.** The third-party datasets this project
+trains on (Pothole-600, Roboflow exports, nuScenes, etc.) each carry their
+own license and terms — check them before redistributing any data. The
+drives I recorded and released myself are covered by
+[dataset/TERMS.md](dataset/TERMS.md).

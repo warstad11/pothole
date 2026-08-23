@@ -1,24 +1,41 @@
 cff-version: 1.2.0
-message: "If you use this project in your research or your own build, please cite it."
+message: "If you use this project, its models, or its dataset, please cite it."
 title: "Pothole Detection Lab: camera, sensor, and hybrid pothole detection with a real-world transfer study"
 type: software
 authors:
   - family-names: "Stading"
     given-names: "Warren"
-date-released: 2026-06-12
+    # After creating a free ORCID iD at https://orcid.org, uncomment and fill:
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+repository-code: "https://github.com/warstad11/pothole"
+url: "https://github.com/warstad11/pothole"
+version: "1.0.0"
+date-released: 2026-06-21
+license: MIT
+# After connecting the repo to Zenodo and cutting a release, add the DOI here:
+# identifiers:
+#   - type: doi
+#     value: "10.5281/zenodo.XXXXXXX"
+#     description: "Archived release (all versions)"
 abstract: >
   A research platform for pothole detection that trains and fairly
   benchmarks image models (YOLOv8, Faster R-CNN, U-Net, ResNet18),
   motion-sensor models (Random Forest, 1D-CNN, BiLSTM), and hybrid
-  fusion models, with a strict pothole-versus-other-anomaly task
-  definition. Includes a 94-test benchmark and a pre-registered,
-  blinded real-world transfer study on iPhone and nuScenes drives
-  showing that the in-lab hybrid advantage does not survive platform
-  transfer when one modality collapses.
+  fusion models, under a strict pothole-versus-other-road-anomaly task
+  definition. Includes a 94-test benchmark campaign and a
+  pre-registered, blinded real-world transfer study on iPhone and
+  nuScenes drives showing that the in-distribution hybrid fusion
+  advantage does not survive platform transfer when one modality
+  collapses. Ships pre-trained models and a privacy-scrubbed dataset of
+  real driving sensor data with human-labeled event clips.
 keywords:
   - pothole detection
   - sensor fusion
+  - multimodal machine learning
   - domain transfer
+  - distribution shift
   - autonomous vehicles
+  - computer vision
+  - accelerometer
   - road maintenance
-license: MIT
+  - open dataset
