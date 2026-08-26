@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "rcdx": {
+    "version": "0.1",
+    "feed_type": "coverage",
+    "publisher": { "name": "Example Fleet", "contact": "data@example.com" },
+    "published_at": "2026-08-23T19:00:00Z"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[-97.7445, 30.2668], [-97.7419, 30.2681]]
+      },
+      "properties": {
+        "segment_id": "osm:way/12345678",
+        "window_start": "2026-08-01T00:00:00Z",
+        "window_end": "2026-08-23T00:00:00Z",
+        "passes": 42,
+        "source": {
+          "modalities": ["camera", "imu"],
+          "vehicle_class": "robotaxi",
+          "detector_id": "example-detector-v3.2"
+        }
+      }
+    }
+  ]
+}

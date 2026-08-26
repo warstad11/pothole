@@ -1,0 +1,48 @@
+{
+  "type": "FeatureCollection",
+  "rcdx": {
+    "version": "0.1",
+    "feed_type": "detections",
+    "publisher": { "name": "Example Fleet", "contact": "data@example.com" },
+    "published_at": "2026-08-23T19:00:00Z",
+    "update_frequency_sec": 3600
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-97.7431, 30.2672] },
+      "properties": {
+        "id": "ex-2026-08-23-000417",
+        "condition_type": "pothole",
+        "detected_at": "2026-08-23T18:42:11Z",
+        "confidence": 0.82,
+        "confidence_basis": "calibrated_precision",
+        "observed_precision_at_threshold": 0.71,
+        "severity": "moderate",
+        "verification": { "status": "unverified", "confirmations": 0 },
+        "source": {
+          "modalities": ["camera", "imu"],
+          "vehicle_class": "robotaxi",
+          "detector_id": "example-detector-v3.2"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-97.7502, 30.2701] },
+      "properties": {
+        "id": "ex-2026-08-23-000418",
+        "condition_type": "pothole",
+        "detected_at": "2026-08-23T18:51:03Z",
+        "confidence": 0.44,
+        "confidence_basis": "uncalibrated_score",
+        "verification": { "status": "verified", "confirmations": 3 },
+        "source": {
+          "modalities": ["imu"],
+          "vehicle_class": "municipal",
+          "detector_id": "city-fleet-rf-v1.0"
+        }
+      }
+    }
+  ]
+}

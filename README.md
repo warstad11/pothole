@@ -169,8 +169,9 @@ Two things I want to build on top of this:
    potholes-as-seen-by-our-cars data solves the problem — cities should
    ask **every** self-driving fleet to feed one shared, open pothole
    database (Waymo already shares some pothole data with Waze; that
-   idea, but for everyone). I'm drafting an open letter to the cities
-   of Austin, Phoenix, and San Francisco making this case.
+   idea, but for everyone). So I drafted a starting point: **[RCDx](spec/)**,
+   an open GeoJSON format any fleet can publish, modeled on USDOT's Work Zone
+   Data Exchange — with a validator that also enforces privacy rules.
 
 ## Documentation map
 
@@ -185,6 +186,7 @@ Two things I want to build on top of this:
 | [docs/DATASETS.md](docs/DATASETS.md) | Advanced | Every dataset, every label rule |
 | [docs/TRANSFER_PROTOCOL.md](docs/TRANSFER_PROTOCOL.md) | Advanced | The pre-registered real-world experiment plan |
 | [dataset/README.md](dataset/README.md) | Easy | My iPhone drives, privacy-scrubbed (sensor + labeled clips) |
+| [spec/](spec/) | Medium | RCDx — open road-condition data format for city fleets |
 | [models/pretrained/](models/pretrained/) | Easy | Ready-to-run trained models (~13 MB) |
 | [results/benchmarks/SUMMARY.md](results/benchmarks/SUMMARY.md) | Medium | The 94-test benchmark tables |
 | [results/transfer/FINDINGS.md](results/transfer/FINDINGS.md) | Medium | The real-world transfer analysis (starts with a plain-English summary) |

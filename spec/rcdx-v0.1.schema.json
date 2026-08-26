@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/warstad11/pothole/spec/rcdx-v0.1.schema.json",
+  "title": "RCDx Road Condition Data Exchange feed (v0.1)",
+  "type": "object",
+  "required": ["type", "rcdx", "features"],
+  "properties": {
+    "type": { "const": "FeatureCollection" },
+    "rcdx": {
+      "type": "object",
+      "required": ["version", "feed_type", "publisher", "published_at"],
+      "properties": {
+        "version": { "const": "0.1" },
+        "feed_type": { "enum": ["detections", "coverage"] },
+        "publisher": {
+          "type": "object",
+          "required": ["name", "contact"],
+          "properties": {
+            "name": { "type": "string" },
+            "contact": { "type": "string" }
+          }
+        },
+        "published_at": { "type": "string", "format": "date-time" },
+        "update_frequency_sec": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "features": { "type": "array", "items": { "$ref": "#/$defs/feature" } }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["modalities", "vehicle_class", "detector_id"],
+      "properties": {
+        "modalities": {
+          "type": "array", "minItems": 1,
+          "items": { "enum": ["camera", "imu", "lidar", "radar", "human"] }
+        },
+        "vehicle_class": {
+          "enum": ["robotaxi", "passenger", "truck", "transit", "municipal", "micromobility"]
+        },
+        "detector_id": { "type": "string" }
+      }
+    },
+    "feature": {
+      "type": "object",
+      "required": ["type", "geometry", "properties"],
+      "properties": {
+        "type": { "const": "Feature" },
+        "geometry": { "type": "object", "required": ["type", "coordinates"] },
+        "properties": {
+          "type": "object",
+          "required": ["source"],
+          "properties": {
+            "id": { "type": "string" },
+            "condition_type": {
+              "enum": ["pothole", "crack", "rough_surface", "debris",
+                       "standing_water", "missing_marking", "other"]
+            },
+            "detected_at": { "type": "string", "format": "date-time" },
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "confidence_basis": {
+              "enum": ["calibrated_precision", "uncalibrated_score", "human_verified"]
+            },
+            "observed_precision_at_threshold": {
+              "type": "number", "minimum": 0, "maximum": 1
+            },
+            "severity": { "enum": ["minor", "moderate", "severe"] },
+            "verification": {
+              "type": "object",
+              "properties": {
+                "status": { "enum": ["unverified", "verified", "rejected", "repaired"] },
+                "confirmations": { "type": "integer", "minimum": 0 }
+              }
+            },
+            "segment_id": { "type": "string" },
+            "window_start": { "type": "string", "format": "date-time" },
+            "window_end": { "type": "string", "format": "date-time" },
+            "passes": { "type": "integer", "minimum": 1 },
+            "source": { "$ref": "#/$defs/source" }
+          }
+        }
+      }
+    }
+  }
+}
